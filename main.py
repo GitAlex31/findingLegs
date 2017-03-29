@@ -56,18 +56,19 @@ def test2():
     paths = simplePaths.exploreSimplePaths(g, 0, numberOfCustomers - 1, droneSpeed=droneSpeed, toPrint=False)
     print("Number of customers : {}".format(numberOfCustomers))
     print("Size of the square : {} meters".format(maxDistance))
-    print("Number of paths : ", len(paths))
-    min_nbr = min([len(path) - 2 for path in paths])
-    max_nbr = max([len(path) - 2 for path in paths])
-    print("Min number of clients between two depots : {}".format(min_nbr))
-    print("Max number of clients between two depots : {}".format(max_nbr))
-    mean = float(sum([len(path) - 2 for path in paths]))
-    mean /= len(paths)
-    print("Mean number of clients between two depots per leg : {}".format(mean))
-    totalNumberPaths = math.factorial(numberOfCustomers - 2) * sum([1 / math.factorial(k) for k in range(numberOfCustomers - 1)])
-    fracPaths = len(paths) / totalNumberPaths
-    print("Fraction of used paths : {} %".format(fracPaths*100))
-    print("Simple paths : ", [[node.getName() for node in trip] for trip in paths])
+    if paths is not None:  # temporary solution for handling the case when the departure node is the destination node
+        ("Number of paths : ", len(paths))
+        min_nbr = min([len(path) - 2 for path in paths])
+        max_nbr = max([len(path) - 2 for path in paths])
+        print("Min number of clients between two depots : {}".format(min_nbr))
+        print("Max number of clients between two depots : {}".format(max_nbr))
+        mean = float(sum([len(path) - 2 for path in paths]))
+        mean /= len(paths)
+        print("Mean number of clients between two depots per leg : {}".format(mean))
+        totalNumberPaths = math.factorial(numberOfCustomers - 2) * sum([1 / math.factorial(k) for k in range(numberOfCustomers - 1)])
+        fracPaths = len(paths) / totalNumberPaths
+        print("Fraction of used paths : {} %".format(fracPaths*100))
+        print("Simple paths : ", [[node.getName() for node in trip] for trip in paths])
 
 
 def main():

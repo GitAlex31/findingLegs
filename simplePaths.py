@@ -1,4 +1,3 @@
-import main
 
 def exploreSimplePaths(g, s, t, currentPath = [], simplePaths = [], droneSpeed = 600, toPrint=False):
     """Function that returns the list of all simple paths between node named s and node named t in graph g."""
