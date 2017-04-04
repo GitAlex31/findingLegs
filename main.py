@@ -32,7 +32,8 @@ def test1():
     print(g)
 
 def test2():
-    """Simulation of the enumeration of all the simple paths in a graph with realistic parameter values"""
+    """Simulation of the enumeration of the simple paths in a graph between the first and last node 
+    with realistic parameter values for drone exploration after a disaster, e.g. in Haiti"""
     nodes = []
     numberOfCustomers = 5
     maxDistance = 1000  # in meters
@@ -43,7 +44,9 @@ def test2():
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
         nodes.append(graph.Node(str(name), x, y, explorationTime))
+
     g = graph.Digraph()
+
     for n in nodes:
         g.addNode(n)
 
@@ -70,10 +73,45 @@ def test2():
         print("Fraction of used paths : {} %".format(fracPaths*100))
         print("Simple paths : ", [[node.getName() for node in trip] for trip in paths])
 
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):
+    """Build graph g with user-defined parameter values"""
+
+    g = graph.Digraph()
+
+    customers = []
+    for i in range(1, numberOfCustomers+1):
+        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
+        y = random.random() * maxDistance
+        name = str(i)
+        customers.append(graph.Node(name, x, y, explorationTime))
+
+    depots = []
+    for i in range(numberOfCustomers+1, numberOfCustomers + numberOfDepots+1):
+        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
+        y = random.random() * maxDistance
+        name = str(i)
+        depots.append(graph.Node(name, x, y, -1))  # the depot has no exploration time : so -1 by default
+
+    # generation of a complete graph
+    nodes = customers + depots
+    for node in nodes:
+        g.addNode(node)
+
+    for node in nodes:
+        for other in nodes:
+            if node != other:
+                g.addEdge(graph.Edge(node, other))
+
+    return g
+
+
+
+
 
 def main():
     #test1()
-    test2()
+    #test2()
+    #test3()
 
 if __name__ == '__main__':
     main()
