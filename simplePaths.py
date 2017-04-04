@@ -26,8 +26,10 @@ def exploreSimplePaths(g, s, t, currentPath = [], simplePaths = [], droneSpeed =
     else:
         for v in g.childrenOf(node_s):
             # if the node is not already visited and that the drone can reach to the end node after
+            # and if the node is not a new depot
             if v not in currentPath \
-                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneCapacity:
+                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneCapacity\
+                    and v.getServiceTime() != -1:
                 # recursion
                 exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, toPrint)
                 # backtracking
@@ -48,3 +50,17 @@ def exploreSimplePaths(g, s, t, currentPath = [], simplePaths = [], droneSpeed =
         #print(usedCapacity)
 
     return simplePaths
+
+def exploreAllSimplePaths(g, droneSpeed = 600, toPrint=False):
+    """Returns the list of all simple paths between depots in graph g, with a drone speed of 600 m/min by default
+    toPrint option True displays some statistics"""
+    customers = g.getCustomers()
+    depots = g.getDepots()
+
+    allSimplePaths = []
+
+    for depot in depots:
+        for other in depots:
+            simplePaths = exploreSimplePaths(depot, other, droneSpeed, toPrint)
+            allSimplePaths.extend(simplePaths)
+    return allSimplePaths
