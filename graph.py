@@ -82,6 +82,14 @@ class Digraph(object):
         else:
             return list_aux[0]
 
+    def getCustomers(self):
+        """Returns the list of nodes that represent customers, i.e. have a service time different from -1"""
+        return [node for node in self.nodes if node.getServiceTime() != -1]
+
+    def getDepots(self):
+        """Returns the list of nodes that represent depots, i.e. have a service time of -1"""
+        return [node for node in self.nodes if node.getServiceTime() == -1]
+
     def __str__(self):
         """String representation of a Digraph object"""
         res = ''
