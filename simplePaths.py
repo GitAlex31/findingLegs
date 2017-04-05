@@ -2,7 +2,7 @@
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, toPrint=False):
     """Function that returns the list of all simple paths between node named s and node named t in graph g."""
 
-    droneCapacity = 100  # the autonomy of a drone in minutes
+    droneCapacity = 25  # the autonomy of a drone in minutes
 
     node_s = g.getNode(s)  # we get the node object from its name
     node_t = g.getNode(t)
@@ -64,5 +64,5 @@ def exploreAllSimplePaths(g, droneSpeed=600, toPrint=False):
             if depot != other:
 
                 allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), other.getName(),
-                                                         currentPath=[], simplePaths=[], droneSpeed=600))
+                                                         [], [], droneSpeed, toPrint))
     return allSimplePaths
