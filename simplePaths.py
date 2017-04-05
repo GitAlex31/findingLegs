@@ -1,8 +1,6 @@
 
-def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, toPrint=False):
+def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25, toPrint=False):
     """Function that returns the list of all simple paths between node named s and node named t in graph g."""
-
-    droneCapacity = 25  # the autonomy of a drone in minutes
 
     node_s = g.getNode(s)  # we get the node object from its name
     node_t = g.getNode(t)
@@ -28,7 +26,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
             # if the node is not already visited and that the drone can reach to the end node after
             # and if the node is not a new depot
             if v not in currentPath \
-                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneCapacity\
+                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneAutonomy\
                     and not (v.getServiceTime() == -1 and v != node_t):
                 # recursion
                 exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, toPrint)
@@ -51,9 +49,10 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
 
     return simplePaths
 
-def exploreAllSimplePaths(g, droneSpeed=600, toPrint=False):
-    """Returns the list of all simple paths between depots in graph g, with a drone speed of 600 m/min by default
-    toPrint option True displays some statistics"""
+def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False):
+    """Returns the list of all simple paths between depots in graph g, 
+    with a drone speed of 600 m/min and an autonomy of 25 min by default.
+    toPrint option True displays some statistics (not working yet)"""
 
     depots = g.getDepots()
 
@@ -64,5 +63,5 @@ def exploreAllSimplePaths(g, droneSpeed=600, toPrint=False):
             if depot != other:
 
                 allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), other.getName(),
-                                                         [], [], droneSpeed, toPrint))
+                                                         [], [], droneSpeed, droneAutonomy, toPrint))
     return allSimplePaths

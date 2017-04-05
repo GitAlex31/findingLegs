@@ -33,17 +33,19 @@ def test1():
 
 def test2():
     """Simulation of the enumeration of the simple paths in a graph between the first and last node 
-    with realistic parameter values for drone exploration after a disaster, e.g. in Haiti"""
+    with realistic parameter values for drone exploration after a disaster, e.g. in Haiti.
+    Here we de not account differentiate depots and customers"""
     nodes = []
     numberOfCustomers = 5
     maxDistance = 1000  # in meters
     explorationTime = 5  # in minutes
     droneSpeed = 600  # in m/min
+    droneAutonomy = 25  # in minutes
 
     for name in range(numberOfCustomers):
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
-        nodes.append(graph.Node(str(name), x, y, explorationTime))
+        nodes.append(graph.Node(str(name), x, y, explorationTime))  # all customers have a 5 minutes exploration time
 
     g = graph.Digraph()
 
@@ -56,7 +58,8 @@ def test2():
             if node != other:
                 g.addEdge(graph.Edge(node, other))
 
-    paths = simplePaths.exploreSimplePaths(g, 0, numberOfCustomers - 1, droneSpeed=droneSpeed, toPrint=False)
+    paths = simplePaths.exploreSimplePaths(g, 0, numberOfCustomers - 1,
+                                           droneSpeed=droneSpeed, droneAutonomy=droneAutonomy, toPrint=False)
     print("Number of customers : {}".format(numberOfCustomers))
     print("Size of the square : {} meters".format(maxDistance))
     if paths is not None:  # temporary solution for handling the case when the departure node is the destination node
@@ -111,6 +114,7 @@ def main():
     g = buildGraph(2, 2, 10)  # for testing
     allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     print([[node.getName() for node in trip] for trip in allSimplePaths])
+    pass
 
 if __name__ == '__main__':
     main()
