@@ -1,8 +1,8 @@
 
-def exploreSimplePaths(g, s, t, currentPath = [], simplePaths = [], droneSpeed = 600, toPrint=False):
+def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, toPrint=False):
     """Function that returns the list of all simple paths between node named s and node named t in graph g."""
 
-    droneCapacity = 25  # the autonomy of a drone is of 25 minutes
+    droneCapacity = 100  # the autonomy of a drone in minutes
 
     node_s = g.getNode(s)  # we get the node object from its name
     node_t = g.getNode(t)
@@ -29,7 +29,7 @@ def exploreSimplePaths(g, s, t, currentPath = [], simplePaths = [], droneSpeed =
             # and if the node is not a new depot
             if v not in currentPath \
                     and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneCapacity\
-                    and v.getServiceTime() != -1:
+                    and not (v.getServiceTime() == -1 and v != node_t):
                 # recursion
                 exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, toPrint)
                 # backtracking
@@ -51,16 +51,18 @@ def exploreSimplePaths(g, s, t, currentPath = [], simplePaths = [], droneSpeed =
 
     return simplePaths
 
-def exploreAllSimplePaths(g, droneSpeed = 600, toPrint=False):
+def exploreAllSimplePaths(g, droneSpeed=600, toPrint=False):
     """Returns the list of all simple paths between depots in graph g, with a drone speed of 600 m/min by default
     toPrint option True displays some statistics"""
-    customers = g.getCustomers()
+
     depots = g.getDepots()
 
     allSimplePaths = []
 
     for depot in depots:
         for other in depots:
-            simplePaths = exploreSimplePaths(depot, other, droneSpeed, toPrint)
-            allSimplePaths.extend(simplePaths)
+            if depot != other:
+
+                allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), other.getName(),
+                                                         currentPath=[], simplePaths=[], droneSpeed=600))
     return allSimplePaths

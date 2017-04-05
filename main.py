@@ -105,13 +105,12 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
     return g
 
 
-
-
-
 def main():
     #test1()
     #test2()
-    #test3()
+    g = buildGraph(2, 2, 10)  # for testing
+    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    print([[node.getName() for node in trip] for trip in allSimplePaths])
 
 if __name__ == '__main__':
     main()
