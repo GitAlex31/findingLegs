@@ -42,6 +42,20 @@ class Edge(object):
     def __str__(self):
         return str(self.src) + '->' + str(self.dest) + ' of distance ' + self.dist
 
+class Path(object):
+    def __init__(self, nodesList):
+        """A path consist in an order list of nodes. The origin and destination nodes are not necessarily depots."""
+        self.nodesList = nodesList
+
+    def computeLength(self, speed):
+        """Returns the length of the path, without counting the service time of the origin nor destination nodes."""
+        length = 0
+        for i in range(len(self.nodesList[:-1])):
+            if i != 0:
+                length += self.nodesList[i].getServiceTime()
+            length += self.nodesList[i].computeDist(self.nodesList[i + 1]) / speed
+        return length
+
 class Digraph(object):
 
     def __init__(self):
