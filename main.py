@@ -111,10 +111,10 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
 def main():
     #test1()
     #test2()
-    g = buildGraph(2, 2, 10)  # for testing
+    g = buildGraph(5, 2, 1000)  # for testing
     #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
-    input.createInputFile(g,"clients.txt")
+    input.createInputFile(g, "clients.txt")
     pass
 
 if __name__ == '__main__':
