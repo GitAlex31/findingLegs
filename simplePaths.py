@@ -29,7 +29,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
                     and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneAutonomy\
                     and not (v.getServiceTime() == -1 and v != node_t):
                 # recursion
-                exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, toPrint)
+                exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, droneAutonomy, toPrint)
                 # backtracking
                 currentPath.pop()
 
