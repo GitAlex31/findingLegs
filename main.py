@@ -1,4 +1,4 @@
-import graph, simplePaths
+import graph, simplePaths, input
 import random, math
 
 def timeToDist(time, speed):
@@ -112,8 +112,9 @@ def main():
     #test1()
     #test2()
     g = buildGraph(2, 2, 10)  # for testing
-    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
-    print([[node.getName() for node in trip] for trip in allSimplePaths])
+    #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    #print([[node.getName() for node in trip] for trip in allSimplePaths])
+    input.createInputFile(g,"clients.txt")
     pass
 
 if __name__ == '__main__':
