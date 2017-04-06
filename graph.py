@@ -1,3 +1,4 @@
+# Author : Alexandre Dossin
 import math
 
 """graph.py contains the classes implementation"""

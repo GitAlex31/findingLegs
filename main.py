@@ -1,3 +1,5 @@
+# Author : Alexandre Dossin
+
 import graph, simplePaths, input
 import random, math
 

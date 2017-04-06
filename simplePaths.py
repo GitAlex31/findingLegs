@@ -1,3 +1,4 @@
+# Author : Alexandre Dossin
 import math
 
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25, toPrint=False):
