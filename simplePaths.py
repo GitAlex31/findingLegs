@@ -10,10 +10,12 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
     usedCapacity = 0  # we reset at each call of the function the used capacity to avoid numerical errors
 
     # we then compute again the used capacity even if not in an optimal way
-    for i in range(len(currentPath[:-1])):
+    for i in range(len(currentPath[:-1])):  # TODO : here is the error
         if i != 0:
             usedCapacity += currentPath[i].getServiceTime()
-        usedCapacity += currentPath[i].computeDist(currentPath[i+1]) / droneSpeed
+        usedCapacity += float(currentPath[i].computeDist(currentPath[i+1])) / droneSpeed
+    usedCapacity += currentPath[-1].getServiceTime()  # major modification here
+    print(usedCapacity)
 
     # base case of the recursion algorithm : the beginning node is the end node
     if node_s == node_t:
@@ -25,8 +27,9 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
         for v in g.childrenOf(node_s):
             # if the node is not already visited and that the drone can reach to the end node after
             # and if the node is not a new depot
+            # TODO : if depot node serviceTime should equal 0
             if v not in currentPath \
-                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneAutonomy\
+                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneAutonomy \
                     and not (v.getServiceTime() == -1 and v != node_t):
                 # recursion
                 exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, droneAutonomy, toPrint)
@@ -36,8 +39,8 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
     if toPrint:  # print option
         #print("Current Path :")
         #print([node.getName() for node in currentPath])
-        print("Simple Paths : ")
-        print([[node.getName() for node in trip] for trip in simplePaths])
+        #print("Simple Paths : ")
+        #print([[node.getName() for node in trip] for trip in simplePaths])
         #for idx in range(len(g.nodes)):
         #   for idx2 in range(idx):
         #       idx_node = g.getNode(idx)
@@ -46,6 +49,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
         #       print("Distance between {} and {} is {}".format(idx_node, idx2_node, dist))
         #print("Current used capacity :")
         #print(usedCapacity)
+        pass
 
     return simplePaths
 
