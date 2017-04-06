@@ -1,3 +1,4 @@
+import math
 
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25, toPrint=False):
     """Function that returns the list of all simple paths between node named s and node named t in graph g."""
@@ -61,7 +62,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
 
     return simplePaths
 
-def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False):
+def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g, 
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     toPrint option True displays some statistics (not working yet)"""
@@ -76,4 +77,27 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False):
 
                 allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), other.getName(),
                                                          [], [], droneSpeed, droneAutonomy, toPrint))
+
+    if printStatistics:
+        numberOfCustomers = len(g.getCustomers())
+        numberOfDepots = len(g.getDepots())
+        print("Number of customers : {}".format(numberOfCustomers))
+        print("Number of Depots : {}".format(numberOfDepots))
+        print("Number of paths : ", len(allSimplePaths))
+        min_nbr = min([len(path) - 2 for path in allSimplePaths])
+        max_nbr = max([len(path) - 2 for path in allSimplePaths])
+        print("Min number of customers between two depots : {}".format(min_nbr))
+        print("Max number of customers between two depots : {}".format(max_nbr))
+        mean = float(sum([len(path) - 2 for path in allSimplePaths]))
+        mean /= len(allSimplePaths)
+        print("Mean number of customers per leg : {}".format(mean))
+        # number of simple paths between any pair of depots in a directed clique
+        totalNumberPaths = math.factorial(numberOfCustomers) * sum(
+            [1 / math.factorial(k) for k in range(numberOfCustomers + 1)])
+        # we multiply by the number of ordered pairs of depots
+        totalNumberPaths *= numberOfDepots * (numberOfDepots - 1)
+        print("Total possible number of paths : {}".format(totalNumberPaths))
+        fracPaths = len(allSimplePaths) / totalNumberPaths
+        print("Fraction of used paths : {} %".format(fracPaths * 100))
+
     return allSimplePaths
