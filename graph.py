@@ -53,7 +53,7 @@ class Path(object):
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
                 length += self.nodesList[i].getServiceTime()
-            length += self.nodesList[i].computeDist(self.nodesList[i + 1]) / speed
+            length += float(self.nodesList[i].computeDist(self.nodesList[i + 1])) / speed
         return length
 
 class Digraph(object):
