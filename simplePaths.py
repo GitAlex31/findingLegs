@@ -10,12 +10,14 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
     usedCapacity = 0  # we reset at each call of the function the used capacity to avoid numerical errors
 
     # we then compute again the used capacity even if not in an optimal way
-    for i in range(len(currentPath[:-1])):  # TODO : here is the error
+    for i in range(len(currentPath[:-1])):
         if i != 0:
             usedCapacity += currentPath[i].getServiceTime()
         usedCapacity += float(currentPath[i].computeDist(currentPath[i+1])) / droneSpeed
-    usedCapacity += currentPath[-1].getServiceTime()  # major modification here
-    print(usedCapacity)
+    # if the last node in currentPath is not a depot, we add its service time to the used capacity
+    # consider code to change if the depot have a non-negative service time
+    if currentPath[-1].getServiceTime() != -1:
+        usedCapacity += currentPath[-1].getServiceTime()
 
     # base case of the recursion algorithm : the beginning node is the end node
     if node_s == node_t:
@@ -25,11 +27,17 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
 
     else:
         for v in g.childrenOf(node_s):
+
+            # we first set the service time of a depot to 0
+            if v.getServiceTime() == -1:
+                serviceTime = 0
+            else:
+                serviceTime = v.getServiceTime()
+
             # if the node is not already visited and that the drone can reach to the end node after
-            # and if the node is not a new depot
-            # TODO : if depot node serviceTime should equal 0
+            # and if the node is not a new depot different from the destination depot that is a function's argument
             if v not in currentPath \
-                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + v.getServiceTime() <= droneAutonomy \
+                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + serviceTime <= droneAutonomy \
                     and not (v.getServiceTime() == -1 and v != node_t):
                 # recursion
                 exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, droneAutonomy, toPrint)
