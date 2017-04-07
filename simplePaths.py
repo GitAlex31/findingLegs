@@ -2,7 +2,8 @@
 import math
 
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25, toPrint=False):
-    """Function that returns the list of all simple paths between node named s and node named t in graph g."""
+    """Function that returns the list of all simple paths between node named s and node named t in graph g.
+    s and t have to be different at the beginning."""
 
     node_s = g.getNode(s)  # we get the node object from its name
     node_t = g.getNode(t)
