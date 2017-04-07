@@ -78,7 +78,7 @@ def test2():
         print("Fraction of used paths : {} %".format(fracPaths*100))
         print("Simple paths : ", [[node.getName() for node in trip] for trip in paths])
 
-def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):  # TODO : put that in graph.py
     """Build graph g with user-defined parameter values"""
 
     g = graph.Digraph()
@@ -91,21 +91,48 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
         customers.append(graph.Node(name, x, y, explorationTime))
 
     depots = []
+    name = numberOfCustomers+1
     for i in range(numberOfCustomers+1, numberOfCustomers + numberOfDepots+1):
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
-        name = str(i)
-        depots.append(graph.Node(name, x, y, -1))  # the depot has no exploration time : so -1 by default
+        depots.append(graph.Node(str(name), x, y, -1))  # the depot has no exploration time : so -1 by default
+        depots.append(graph.Node(str(name+1), x, y, -1))  # we duplicate each depot
+        name += 2
 
-    # generation of a complete graph
+    # generation of a graph allowing the exploration of the complete graph and also the self circuits
     nodes = customers + depots
     for node in nodes:
         g.addNode(node)
 
-    for node in nodes:
-        for other in nodes:
-            if node != other:
+    #for node in nodes:
+    #    for other in nodes:
+    #       if node != other:
+    #           g.addEdge(graph.Edge(node, other))
+
+    depotsListForGraphExploration = [depot for depot in depots if depots.index(depot) % 2 == 0]
+    depotsListForSelfLoops = [depot for depot in depots if depots.index(depot) % 2 != 0]
+
+    for customer in customers:  # first, we make a directed clique with the customers set
+        for other in customers:
+            if customer != other:
                 g.addEdge(graph.Edge(node, other))
+
+    for depot in depotsListForGraphExploration:  # then we add the edges for the graph exploration
+        for customer in customers:
+            g.addEdge(graph.Edge(depot, customer))
+            g.addEdge(graph.Edge(customer, depot))
+        for other in depotsListForGraphExploration:
+            if depot != other:
+                g.addEdge(graph.Edge(depot, other))
+
+    for depot in depotsListForSelfLoops:  # finally we add the edges to allow for self circuits
+        for customer in customers:
+            g.addEdge(graph.Edge(depot, customer))
+
+        # index corresponding to the associated depot for graph exploration
+        correspondingDepotIdx = int(depot.getName()) - 1
+
+        g.addEdge(graph.Edge(depot, g.getNode(correspondingDepotIdx)))
 
     return g
 
@@ -113,10 +140,11 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
 def main():
     #test1()
     #test2()
-    g = buildGraph(2, 2, 1000)  # for testing
+    g = buildGraph(1, 1, 1000)  # for testing
+    print(g)
     #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
-    input.createInputFile(g, "clients.txt", droneAutonomy=100000, printStatistics=True)
+    #input.createInputFile(g, "clients.txt", droneAutonomy=25, printStatistics=True)
     pass
 
 if __name__ == '__main__':
