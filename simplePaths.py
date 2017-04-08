@@ -90,21 +90,27 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False, pr
     if printStatistics:  # TODO : correct the statistics
         numberOfCustomers = len(g.getCustomers())
         numberOfDepots = len(g.getDepots())
+        numberOfDepots = int(numberOfDepots / 2)  # this is the number of real depots
         print("Number of customers : {}".format(numberOfCustomers))
         print("Number of Depots : {}".format(numberOfDepots))
         print("Number of paths : ", len(allSimplePaths))
-        min_nbr = min([len(path) - 2 for path in allSimplePaths])
+        min_nbr = min([len(path) - 2 for path in allSimplePaths])  # always 0 for because of self-loops and depot-depot simple paths
         max_nbr = max([len(path) - 2 for path in allSimplePaths])
         print("Min number of customers between two depots : {}".format(min_nbr))
         print("Max number of customers between two depots : {}".format(max_nbr))
         mean = float(sum([len(path) - 2 for path in allSimplePaths]))
         mean /= len(allSimplePaths)
         print("Mean number of customers per leg : {}".format(mean))
-        # number of simple paths between any pair of depots in a directed clique
+        # number of simple paths between any pair of depots in a directed clique, with origin and destination different
         totalNumberPaths = math.factorial(numberOfCustomers) * sum(
             [1 / math.factorial(k) for k in range(numberOfCustomers + 1)])
         # we multiply by the number of ordered pairs of depots
         totalNumberPaths *= numberOfDepots * (numberOfDepots - 1)
+        # we add the simple paths due to self loops
+        numberOfPathsForOneSelfLoop = math.factorial(numberOfCustomers) * sum(
+            [1 / math.factorial(k) for k in range(numberOfCustomers + 1)])
+        totalNumberPaths += numberOfPathsForOneSelfLoop * numberOfDepots
+
         print("Total possible number of paths : {}".format(totalNumberPaths))
         fracPaths = len(allSimplePaths) / totalNumberPaths
         print("Fraction of used paths : {} %".format(fracPaths * 100))
