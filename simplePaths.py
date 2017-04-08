@@ -87,7 +87,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False, pr
         allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), int(depot.getName()) - 1,  # real depot associated
                                                          [], [], droneSpeed, droneAutonomy, toPrint))
 
-    if printStatistics:  # TODO : correct the statistics
+    if printStatistics:
         numberOfCustomers = len(g.getCustomers())
         numberOfDepots = len(g.getDepots())
         numberOfDepots = int(numberOfDepots / 2)  # this is the number of real depots
