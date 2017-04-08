@@ -110,7 +110,7 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
     for customer in customers:  # first, we make a directed clique with the customers set
         for other in customers:
             if customer != other:
-                g.addEdge(graph.Edge(node, other))
+                g.addEdge(graph.Edge(customer, other))
 
     for depot in depotsListForGraphExploration:  # then we add the edges for the graph exploration
         for customer in customers:
@@ -138,13 +138,13 @@ def main():
     numberOfCustomers = 1
     numberOfDepots = 2
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
-        g = buildGraph(numberOfCustomers, numberOfDepots, 1000)  # for testing TODO : check if working properly (necessarily more than 1 depot)
+        g = buildGraph(numberOfCustomers, numberOfDepots, 1000)  # for testing
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
-    print(g)
-    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
-    print([[node.getName() for node in trip] for trip in allSimplePaths])
-    #input.createInputFile(g, "clients.txt", droneAutonomy=25, printStatistics=True)
+    #print(g)
+    #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    #print([[node.getName() for node in trip] for trip in allSimplePaths])
+    input.createInputFile(g, "clients.txt", droneAutonomy=25, printStatistics=True)
     pass
 
 if __name__ == '__main__':
