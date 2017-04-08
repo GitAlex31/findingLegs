@@ -69,18 +69,25 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, toPrint=False, pr
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     toPrint option True displays some statistics (not working yet)"""
 
-    depots = g.getDepots()
+    depots = sorted(g.getDepots())  # the list is sorted because the node sequence is initially a set (unordered)
 
     allSimplePaths = []
 
-    for depot in depots:
-        for other in depots:
+    depotsListForGraphExploration = [depot for depot in depots if depots.index(depot) % 2 == 0]
+    depotsListForSelfLoops = [depot for depot in depots if depots.index(depot) % 2 != 0]
+
+    for depot in depotsListForGraphExploration:  # simple paths between different depots
+        for other in depotsListForGraphExploration:
             if depot != other:
 
                 allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), other.getName(),
                                                          [], [], droneSpeed, droneAutonomy, toPrint))
 
-    if printStatistics:
+    for depot in depotsListForSelfLoops:
+        allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), int(depot.getName()) - 1,  # real depot associated
+                                                         [], [], droneSpeed, droneAutonomy, toPrint))
+
+    if printStatistics:  # TODO : correct the statistics
         numberOfCustomers = len(g.getCustomers())
         numberOfDepots = len(g.getDepots())
         print("Number of customers : {}".format(numberOfCustomers))
