@@ -47,7 +47,7 @@ class Edge(object):
         return self.dist
 
     def __str__(self):
-        return str(self.src) + '->' + str(self.dest) + ' of distance ' + self.dist
+        return str(self.src) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
 
 class Path(object):
     def __init__(self, nodesList):
