@@ -25,6 +25,12 @@ class Node(object):
     def __str__(self):
         return "Noeud " + self.name
 
+    def __lt__(self, other):
+        return int(self.getName()) < int(other.getName())
+
+    def __ge__(self, other):
+        return int(self.getName()) >= int(other.getName())
+
 
 class Edge(object):
     def __init__(self, src, dest):
@@ -56,6 +62,7 @@ class Path(object):
                 length += self.nodesList[i].getServiceTime()
             length += float(self.nodesList[i].computeDist(self.nodesList[i + 1])) / speed
         return length
+
 
 class Digraph(object):
 
