@@ -104,11 +104,6 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
     for node in nodes:
         g.addNode(node)
 
-    #for node in nodes:
-    #    for other in nodes:
-    #       if node != other:
-    #           g.addEdge(graph.Edge(node, other))
-
     depotsListForGraphExploration = [depot for depot in depots if depots.index(depot) % 2 == 0]
     depotsListForSelfLoops = [depot for depot in depots if depots.index(depot) % 2 != 0]
 
@@ -140,10 +135,15 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
 def main():
     #test1()
     #test2()
-    g = buildGraph(1, 1, 1000)  # for testing
+    numberOfCustomers = 1
+    numberOfDepots = 2
+    if numberOfCustomers >= 1 and numberOfDepots >= 2:
+        g = buildGraph(numberOfCustomers, numberOfDepots, 1000)  # for testing TODO : check if working properly (necessarily more than 1 depot)
+    else:
+        raise ValueError("The network must have at least 1 customer and 2 depots.")
     print(g)
-    #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
-    #print([[node.getName() for node in trip] for trip in allSimplePaths])
+    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    print([[node.getName() for node in trip] for trip in allSimplePaths])
     #input.createInputFile(g, "clients.txt", droneAutonomy=25, printStatistics=True)
     pass
 
