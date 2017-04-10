@@ -135,7 +135,7 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
 def main():
     #test1()
     #test2()
-    numberOfCustomers = 2
+    numberOfCustomers = 1
     numberOfDepots = 2
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
         g = buildGraph(numberOfCustomers, numberOfDepots, 1000)  # for testing
@@ -152,7 +152,7 @@ def main():
     input.createGENCOLInputFileTasks(fileName, numberOfCustomers)
     input.createGENCOLInputFileColumns(fileName, 40)
     timeIntervals = [[0, 5], [2, 7]]
-    input.createGENCOLInputFileNodes(fileName, numberOfCustomers, numberOfDepots, timeIntervals)
+    input.createGENCOLInputFileNodes(fileName, g, timeIntervals)
     input.createGENCOLInputFileArcs(fileName, g)
     input.createGENCOLInputFileNetwork(fileName)
     pass
