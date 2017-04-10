@@ -77,17 +77,15 @@ def createGENCOLInputFileColumns(fileName, numberOfVehicles):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileNodes(fileName, numberOfCustomers, numberOfDepots, timeIntervals):
+def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     myFile = open(fileName, 'a')
     myFile.write("Nodes={\n")
 
     myFile.write("Source [0 0];\n")
 
-    idx = 0
-    for depot in range(numberOfCustomers + 1, numberOfCustomers + numberOfDepots + 1):
-        myFile.write("N{} [{} {}]; \n".format(str(depot) + "arr", timeIntervals[idx][0], timeIntervals[idx][1]))
-        myFile.write("N{} [{} {}]; \n".format(str(depot) + "dep", timeIntervals[idx][0], timeIntervals[idx][1]))
-        idx += 1
+    for i, depot in enumerate(g.getRealDepots()):
+        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
+        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
 
     myFile.write("Destination [0 1440];\n")
 
