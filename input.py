@@ -19,20 +19,44 @@ def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, toPrint=False
     # filling the file with legs
     for i, leg in enumerate(simplePathsList):
         leg_id = i
-        # making an object of the path is used to compute in a more OOP way the length of that path
-        legObject = graph.Path(leg)
+
+        if leg[0] in g.getOtherDepots():
+            dep = g.getNode(int(leg[0].getName()) - 1)
+        else:
+            dep = leg[0]
+
+        if leg[-1] in g.getOtherDepots():
+            dest = g.getNode(int(leg[-1].getName()) - 1)
+        else:
+            dest = leg[-1]
+        legObject = graph.Path(leg)  # more OOP way
         time = legObject.computeLength(droneSpeed)
         visitedNodesStr = str()
         if len(leg) > 2:
             visitedNodesStr = " ".join([node.getName() for node in leg[1:-1]])
 
 
-        myFile.write(str(leg_id) + '        ' + str(round(time, 1)) + '         ' + str(leg[0].getName())
-                     + '           ' + str(leg[-1].getName()) + '                   '
+        myFile.write(str(leg_id) + '        ' + str(round(time, 1)) + '         ' + str(dest.getName())
+                     + '           ' + str(dest.getName()) + '                   '
                      '[' + visitedNodesStr + ']')
         myFile.write('\n')
     pass
 
+def createGENCOLInputFile(fileName):
+    myFile = open(fileName, 'w')
+    pass
+
+def createGENCOLInputFileResources(fileName):
+    myFile = open(fileName, 'a')
+    myFile.write("Resources={\nTime Strong;\n};")
+    pass
+
+def createGENCOLInputFileRows():
+    pass
+
+"""fileName = "test.txt"
+createGENCOLInputFile(fileName)
+createGENCOLInputFileResources(fileName)"""
 
 
 
