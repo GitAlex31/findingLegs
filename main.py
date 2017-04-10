@@ -104,7 +104,7 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
     for node in nodes:
         g.addNode(node)
 
-    depotsListForGraphExploration = [depot for depot in depots if depots.index(depot) % 2 == 0]
+    depotsListForGraphExploration = [depot for depot in depots if depots.index(depot) % 2 == 0]  # TODO : change with the class mehods of graph.py
     depotsListForSelfLoops = [depot for depot in depots if depots.index(depot) % 2 != 0]
 
     for customer in customers:  # first, we make a directed clique with the customers set
@@ -135,7 +135,7 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
 def main():
     #test1()
     #test2()
-    numberOfCustomers = 1
+    numberOfCustomers = 2
     numberOfDepots = 2
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
         g = buildGraph(numberOfCustomers, numberOfDepots, 1000)  # for testing
@@ -144,7 +144,17 @@ def main():
     #print(g)
     #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
-    input.createInputFile(g, "clients.txt", droneAutonomy=25, printStatistics=True)
+    input.createInputFile(g, "clients.txt")
+    fileName = "input0.txt"
+    input.createGENCOLInputFile(fileName)
+    input.createGENCOLInputFileResources(fileName)
+    input.createGENCOLInputFileRows(fileName, numberOfCustomers)
+    input.createGENCOLInputFileTasks(fileName, numberOfCustomers)
+    input.createGENCOLInputFileColumns(fileName, 40)
+    timeIntervals = [[0, 5], [2, 7]]
+    input.createGENCOLInputFileNodes(fileName, numberOfCustomers, numberOfDepots, timeIntervals)
+    input.createGENCOLInputFileArcs(fileName, g)
+    input.createGENCOLInputFileNetwork(fileName)
     pass
 
 if __name__ == '__main__':
