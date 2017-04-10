@@ -77,14 +77,20 @@ def createGENCOLInputFileColumns(fileName, numberOfVehicles):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileNodes(fileName, numberOfCustomers, numberOfDepots, timeIntervals):  # TODO : add source and destination
+def createGENCOLInputFileNodes(fileName, numberOfCustomers, numberOfDepots, timeIntervals):
     myFile = open(fileName, 'a')
     myFile.write("Nodes={\n")
+
+    myFile.write("Source [0 0];\n")
+
     idx = 0
     for depot in range(numberOfCustomers + 1, numberOfCustomers + numberOfDepots + 1):
         myFile.write("N{} [{} {}]; \n".format(str(depot) + "arr", timeIntervals[idx][0], timeIntervals[idx][1]))
         myFile.write("N{} [{} {}]; \n".format(str(depot) + "dep", timeIntervals[idx][0], timeIntervals[idx][1]))
         idx += 1
+
+    myFile.write("Destination [0 1440];\n")
+
     myFile.write("};\n\n")
     pass
 
@@ -115,7 +121,11 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toP
         if len(leg) > 2:
             visitedNodesStr = "D" + " D".join([node.getName() for node in leg[1:-1]])
 
-        myFile.write("N{} N{} {} [{}] {}\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
+        myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
+
+    for depot in g.getRealDepots():
+        myFile.write("Source N{} 0 [0] (RowVeh - 1);\n".format(depot.getName() + "dep"))  # we add the sources arcs
+        myFile.write("Destination N{} 0 [0];\n".format(depot.getName() + "dep"))  # and the destination arcs
 
     myFile.write("};\n\n")
 
