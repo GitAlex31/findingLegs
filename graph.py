@@ -112,6 +112,14 @@ class Digraph(object):
         """Returns the list of nodes that represent depots, i.e. have a service time of -1"""
         return [node for node in self.nodes if node.getServiceTime() == -1]
 
+    def getRealDepots(self):
+        sortedDepotsList = sorted(self.getDepots())
+        return [depot for depot in sortedDepotsList if sortedDepotsList.index(depot) % 2 == 0]
+
+    def getOtherDepots(self):
+        sortedDepotsList = sorted(self.getDepots())
+        return [depot for depot in sortedDepotsList if sortedDepotsList.index(depot) % 2 != 0]
+
     def __str__(self):
         """String representation of a Digraph object"""
         res = ''
