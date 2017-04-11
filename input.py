@@ -32,7 +32,8 @@ def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, toPrint=False
 
         legObject = graph.Path(leg)  # more OOP way
 
-        time = legObject.computeLength(droneSpeed)
+        # converting time from minutes to seconds for more precision
+        time = int(legObject.computeLength(droneSpeed) * 60)
 
         visitedNodesStr = str()
         if len(leg) > 2:
@@ -92,7 +93,7 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):  # TODO : add source and node
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):
 
     simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, toPrint, printStatistics)
 
@@ -113,7 +114,8 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toP
 
         legObject = graph.Path(leg)  # more OOP way
 
-        time = legObject.computeLength(droneSpeed)
+        # converting time from minutes to seconds for more precision
+        time = int(legObject.computeLength(droneSpeed) * 60)
 
         visitedNodesStr = str()
         if len(leg) > 2:
@@ -122,8 +124,8 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toP
         myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
 
     for depot in g.getRealDepots():
-        myFile.write("Source N{} 0 [0] (RowVeh - 1);\n".format(depot.getName() + "dep"))  # we add the sources arcs
-        myFile.write("Destination N{} 0 [0];\n".format(depot.getName() + "dep"))  # and the destination arcs
+        myFile.write("Source N{} 0 [0] (RowVeh -1);\n".format(depot.getName() + "dep"))  # we add the sources arcs
+        myFile.write("N{} Destination 0 [0];\n".format(depot.getName() + "dep"))  # and the destination arcs
 
     myFile.write("};\n\n")
 
