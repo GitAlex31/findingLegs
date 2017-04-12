@@ -125,7 +125,7 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toP
 
     for depot in g.getRealDepots():
         myFile.write("Source N{} 0 [0] (RowVeh -1);\n".format(depot.getName() + "dep"))  # we add the sources arcs
-        myFile.write("N{} Destination 0 [0];\n".format(depot.getName() + "dep"))  # and the destination arcs
+        myFile.write("N{} Destination 0 [0];\n".format(depot.getName() + "arr"))  # and the destination arcs
 
     myFile.write("};\n\n")
 
