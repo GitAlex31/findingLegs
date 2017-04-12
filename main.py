@@ -146,15 +146,10 @@ def main():
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
     input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"
-    input.createGENCOLInputFile(fileName)
-    input.createGENCOLInputFileResources(fileName)
-    input.createGENCOLInputFileRows(fileName, numberOfCustomers)
-    input.createGENCOLInputFileTasks(fileName, numberOfCustomers)
-    input.createGENCOLInputFileColumns(fileName, 40)
     timeIntervals = [[0, 1440]] * numberOfDepots
-    input.createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    input.createGENCOLInputFileArcs(fileName, g)
-    input.createGENCOLInputFileNetwork(fileName)
+    fixedCost = 100  # if high value, the problem is the minimization of the number of vehicles
+    input.createCompleteGENCOLInputFile(fileName, g, numberOfCustomers, fixedCost, timeIntervals,
+                                  droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False)
     pass
 
 if __name__ == '__main__':
