@@ -151,7 +151,7 @@ def main():
     input.createGENCOLInputFileRows(fileName, numberOfCustomers)
     input.createGENCOLInputFileTasks(fileName, numberOfCustomers)
     input.createGENCOLInputFileColumns(fileName, 40)
-    timeIntervals = [[0, 5], [2, 7]]
+    timeIntervals = [[0, 1440]] * numberOfDepots
     input.createGENCOLInputFileNodes(fileName, g, timeIntervals)
     input.createGENCOLInputFileArcs(fileName, g)
     input.createGENCOLInputFileNetwork(fileName)
