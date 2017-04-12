@@ -71,10 +71,10 @@ def createGENCOLInputFileTasks(fileName, numberOfCustomers):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileColumns(fileName, numberOfVehicles):
+def createGENCOLInputFileColumns(fileName, fixedCost):
     myFile = open(fileName, 'a')
     myFile.write("Columns={\n")
-    myFile.write("Vehicles {} CutUp(RowVeh 1);\n".format(int(numberOfVehicles)))
+    myFile.write("Vehicles {} CutUp(RowVeh 1);\n".format(int(fixedCost)))
     myFile.write("};\n\n")
     pass
 
@@ -137,4 +137,16 @@ def createGENCOLInputFileNetwork(fileName):
     myFile.write("Net Source (Destination);")
     myFile.write("\n};")
 
+def createCompleteGENCOLInputFile(fileName, g, numberOfCustomers, fixedCost, timeIntervals,
+                                  droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):
+    """Creates the complete GENCOL input file"""
+    createGENCOLInputFile(fileName)
+    createGENCOLInputFileResources(fileName)
+    createGENCOLInputFileRows(fileName, numberOfCustomers)
+    createGENCOLInputFileTasks(fileName, numberOfCustomers)
+    createGENCOLInputFileColumns(fileName, fixedCost)
+    createGENCOLInputFileNodes(fileName, g, timeIntervals)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, toPrint, printStatistics)
+    createGENCOLInputFileNetwork(fileName)
+    pass
 
