@@ -131,8 +131,9 @@ class Digraph(object):
         return res[:-1]
 
 
-def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):
-    """Build graph g with user-defined parameter values and random positions for nodes"""
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):  # TODO : maxDistance should be an attribute of graph
+    """Build graph g with user-defined parameter values and random positions for nodes.
+    Trick used to allow for self-loops is the duplication of depots."""  # TODO : in fact the whole function should be in the class ?
 
     g = Digraph()
 
