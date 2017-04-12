@@ -2,11 +2,11 @@
 import simplePaths
 import graph
 
-def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):
+def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, printStatistics=False):
     """Returns the input file that contains the list of legs.
     A leg is represented by an id, its cost, an origin and a destination depot and a list of visited customers"""
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, toPrint, printStatistics)
+    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, printStatistics)
     myFile = open(fileName, "w")
     myFile.write("Number of customers: {}   Number of Depots: {}    Drone Autonomy: {} min  Drone Speed:{} m/min"
                  .format(len(g.getCustomers()), int(len(g.getDepots()) / 2), droneAutonomy, droneSpeed))
@@ -55,18 +55,18 @@ def createGENCOLInputFileResources(fileName):
     myFile.write("Resources={\nTime Strong;\n};\n\n")
     pass
 
-def createGENCOLInputFileRows(fileName, numberOfCustomers):
+def createGENCOLInputFileRows(fileName, g):
     myFile = open(fileName, 'a')
     myFile.write("Rows={\n")
-    for customer in range(1, numberOfCustomers + 1):
+    for customer in range(1, len(g.getCustomers()) + 1):
         myFile.write("RowD{} = 1 TaskStrong;\n".format(str(customer)))
     myFile.write("RowVeh = 0;\n};\n\n")
     pass
 
-def createGENCOLInputFileTasks(fileName, numberOfCustomers):
+def createGENCOLInputFileTasks(fileName, g):
     myFile = open(fileName, 'a')
     myFile.write("Tasks={\n")
-    for customer in range(1, numberOfCustomers + 1):
+    for customer in range(1, len(g.getCustomers()) + 1):
         myFile.write("D{} RowD{} Strong;\n".format(str(customer), str(customer)))
     myFile.write("};\n\n")
     pass
@@ -74,7 +74,7 @@ def createGENCOLInputFileTasks(fileName, numberOfCustomers):
 def createGENCOLInputFileColumns(fileName, fixedCost):
     myFile = open(fileName, 'a')
     myFile.write("Columns={\n")
-    myFile.write("Vehicles {} CutUp(RowVeh 1);\n".format(int(fixedCost)))
+    myFile.write("Vehicles {} Int(RowVeh 1);\n".format(int(fixedCost)))
     myFile.write("};\n\n")
     pass
 
@@ -93,9 +93,9 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, printStatistics=False):
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, toPrint, printStatistics)
+    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, printStatistics)
 
     myFile = open(fileName, 'a')
     myFile.write("Arcs={\n")
@@ -137,16 +137,28 @@ def createGENCOLInputFileNetwork(fileName):
     myFile.write("Net Source (Destination);")
     myFile.write("\n};")
 
-def createCompleteGENCOLInputFile(fileName, g, numberOfCustomers, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False):
+def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
+                                  droneSpeed=600, droneAutonomy=25, printStatistics=False):
     """Creates the complete GENCOL input file"""
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
-    createGENCOLInputFileRows(fileName, numberOfCustomers)
-    createGENCOLInputFileTasks(fileName, numberOfCustomers)
+    createGENCOLInputFileRows(fileName, g)  #TODO : put numberOfCustomers argument in a graph method
+    createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, toPrint, printStatistics)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, printStatistics)
     createGENCOLInputFileNetwork(fileName)
     pass
 
+
+def generateGENCOLInputFiles(numberOfCustomers, numberOfDepots, fixedCost,
+                                  droneSpeed=600, droneAutonomy=25, printStatistics=False):
+
+    for i, customer in enumerate(range(1, numberOfCustomers + 1)):
+        for j, depot in enumerate(range(2, numberOfDepots + 1)):
+            g = graph.buildGraph(customer, depot, maxDistance=1000, explorationTime=5)
+            timeIntervals = [[0, 1440]] * numberOfDepots
+            createCompleteGENCOLInputFile("input{}_{}.txt".format(customer, depot), g, fixedCost,
+                                          timeIntervals, droneSpeed, droneAutonomy, printStatistics)
+
+    pass

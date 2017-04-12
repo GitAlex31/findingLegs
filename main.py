@@ -61,7 +61,7 @@ def test2():
                 g.addEdge(graph.Edge(node, other))
 
     paths = simplePaths.exploreSimplePaths(g, 0, numberOfCustomers - 1,
-                                           droneSpeed=droneSpeed, droneAutonomy=droneAutonomy, toPrint=False)
+                                           droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
     print("Number of customers : {}".format(numberOfCustomers))
     print("Size of the square : {} meters".format(maxDistance))
     if paths is not None:  # temporary solution for handling the case when the departure node is the destination node
@@ -94,10 +94,11 @@ def main():
     input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"
     timeIntervals = [[0, 1440]] * numberOfDepots
-    fixedCost = 100  # if high value, the problem is the minimization of the number of vehicles
-    input.createCompleteGENCOLInputFile(fileName, g, numberOfCustomers, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, toPrint=False, printStatistics=False)
-    pass
+    fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
+    input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
+                                  droneSpeed=600, droneAutonomy=25, printStatistics=False)
+
+    #input.generateGENCOLInputFiles(5, 2, 10000)
 
 if __name__ == '__main__':
     main()
