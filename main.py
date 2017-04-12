@@ -3,11 +3,6 @@
 import graph, simplePaths, input
 import random, math
 
-def timeToDist(time, speed):
-    return float(time)*speed
-
-def distToTime(dist, speed):
-    return float(dist) // speed
 
 def test1():
     """Working test of building a graph with 10 nodes with random positions in a 10*10 unit of distance square.
