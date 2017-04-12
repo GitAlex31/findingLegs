@@ -1,5 +1,5 @@
 # Author : Alexandre Dossin
-import math
+import math, random
 
 """graph.py contains the classes implementation"""
 
@@ -113,10 +113,12 @@ class Digraph(object):
         return [node for node in self.nodes if node.getServiceTime() == -1]
 
     def getRealDepots(self):
+        """Returns the list of real depots"""
         sortedDepotsList = sorted(self.getDepots())
         return [depot for depot in sortedDepotsList if sortedDepotsList.index(depot) % 2 == 0]
 
     def getOtherDepots(self):
+        """Returns the list of virtual depots used for self-loops paths"""
         sortedDepotsList = sorted(self.getDepots())
         return [depot for depot in sortedDepotsList if sortedDepotsList.index(depot) % 2 != 0]
 
@@ -127,3 +129,57 @@ class Digraph(object):
             for d in self.edges[k]:
                 res = res + str(k) + '->' + str(d) + ' distance of ' + str(k.computeDist(d)) + '\n'
         return res[:-1]
+
+
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):
+    """Build graph g with user-defined parameter values and random positions for nodes"""
+
+    g = Digraph()
+
+    customers = []
+    for i in range(1, numberOfCustomers+1):
+        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
+        y = random.random() * maxDistance
+        name = str(i)
+        customers.append(Node(name, x, y, explorationTime))
+
+    depots = []
+    name = numberOfCustomers+1
+    for i in range(numberOfCustomers+1, numberOfCustomers + numberOfDepots+1):
+        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
+        y = random.random() * maxDistance
+        depots.append(Node(str(name), x, y, -1))  # the depot has no exploration time : so -1 by default
+        depots.append(Node(str(name+1), x, y, -1))  # we duplicate each depot
+        name += 2
+
+    # generation of a graph allowing the exploration of the complete graph and also the self circuits
+    nodes = customers + depots
+    for node in nodes:
+        g.addNode(node)
+
+    depotsListForGraphExploration = g.getRealDepots()
+    depotsListForSelfLoops = g.getOtherDepots()
+
+    for customer in customers:  # first, we make a directed clique with the customers set
+        for other in customers:
+            if customer != other:
+                g.addEdge(Edge(customer, other))
+
+    for depot in depotsListForGraphExploration:  # then we add the edges for the graph exploration
+        for customer in customers:
+            g.addEdge(Edge(depot, customer))
+            g.addEdge(Edge(customer, depot))
+        for other in depotsListForGraphExploration:
+            if depot != other:
+                g.addEdge(Edge(depot, other))
+
+    for depot in depotsListForSelfLoops:  # finally we add the edges to allow for self circuits
+        for customer in customers:
+            g.addEdge(Edge(depot, customer))
+
+        # index corresponding to the associated depot for graph exploration
+        correspondingDepotIdx = int(depot.getName()) - 1
+
+        g.addEdge(Edge(depot, g.getNode(correspondingDepotIdx)))
+
+    return g
