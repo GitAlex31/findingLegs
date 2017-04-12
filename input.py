@@ -4,7 +4,8 @@ import graph
 
 def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, printStatistics=False):
     """Returns the input file that contains the list of legs.
-    A leg is represented by an id, its cost, an origin and a destination depot and a list of visited customers"""
+    A leg is represented by an id, its cost, an origin and a destination depot and a list of visited customers.
+    Not used by GENCOL but provides a more readable file for the user."""
 
     simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, printStatistics)
     myFile = open(fileName, "w")
@@ -142,7 +143,7 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
     """Creates the complete GENCOL input file"""
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
-    createGENCOLInputFileRows(fileName, g)  #TODO : put numberOfCustomers argument in a graph method
+    createGENCOLInputFileRows(fileName, g)
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals)
