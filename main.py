@@ -1,13 +1,8 @@
 # Author : Alexandre Dossin
 
-import graph, simplePaths, input
+import graph, simplePaths, input, display
 import random, math
 
-def timeToDist(time, speed):
-    return float(time)*speed
-
-def distToTime(dist, speed):
-    return float(dist) // speed
 
 def test1():
     """Working test of building a graph with 10 nodes with random positions in a 10*10 unit of distance square.
@@ -61,7 +56,7 @@ def test2():
                 g.addEdge(graph.Edge(node, other))
 
     paths = simplePaths.exploreSimplePaths(g, 0, numberOfCustomers - 1,
-                                           droneSpeed=droneSpeed, droneAutonomy=droneAutonomy, toPrint=False)
+                                           droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
     print("Number of customers : {}".format(numberOfCustomers))
     print("Size of the square : {} meters".format(maxDistance))
     if paths is not None:  # temporary solution for handling the case when the departure node is the destination node
@@ -78,46 +73,34 @@ def test2():
         print("Fraction of used paths : {} %".format(fracPaths*100))
         print("Simple paths : ", [[node.getName() for node in trip] for trip in paths])
 
-def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):
-    """Build graph g with user-defined parameter values"""
-
-    g = graph.Digraph()
-
-    customers = []
-    for i in range(1, numberOfCustomers+1):
-        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
-        y = random.random() * maxDistance
-        name = str(i)
-        customers.append(graph.Node(name, x, y, explorationTime))
-
-    depots = []
-    for i in range(numberOfCustomers+1, numberOfCustomers + numberOfDepots+1):
-        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
-        y = random.random() * maxDistance
-        name = str(i)
-        depots.append(graph.Node(name, x, y, -1))  # the depot has no exploration time : so -1 by default
-
-    # generation of a complete graph
-    nodes = customers + depots
-    for node in nodes:
-        g.addNode(node)
-
-    for node in nodes:
-        for other in nodes:
-            if node != other:
-                g.addEdge(graph.Edge(node, other))
-
-    return g
-
 
 def main():
     #test1()
     #test2()
-    g = buildGraph(2, 2, 1000)  # for testing
+    numberOfCustomers = 5
+    numberOfDepots = 2
+    maxDistance = 1000  # in meters
+    if numberOfCustomers >= 1 and numberOfDepots >= 2:
+        g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # for testing
+    else:
+        raise ValueError("The network must have at least 1 customer and 2 depots.")
+    #print(g)
     #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
-    input.createInputFile(g, "clients.txt", droneAutonomy=100000, printStatistics=True)
-    pass
+    input.createInputFile(g, "clients.txt")
+    fileName = "input0.txt"
+    timeIntervals = [[0, 1440]] * numberOfDepots
+    fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
+    input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
+                                  droneSpeed=600, droneAutonomy=25, printStatistics=False)
+
+    displayBool = True
+    if displayBool:
+        root = display.Tk()
+        wdw = display.Window(root, g)
+        root.geometry("800x600+300+100")
+        root.mainloop()
+
 
 if __name__ == '__main__':
     main()
