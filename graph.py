@@ -23,7 +23,7 @@ class Node(object):
         return math.sqrt(math.pow(self.x - other.x, 2) + math.pow(self.y - other.y, 2))
 
     def __str__(self):
-        return "Noeud " + self.name
+        return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")"
 
     def __lt__(self, other):
         return int(self.getName()) < int(other.getName())
@@ -103,6 +103,10 @@ class Digraph(object):
             raise ValueError("Node not present in list of nodes")
         else:
             return list_aux[0]
+
+    def getNodes(self):
+        """Returns the list of nodes, either a customer or a depot"""
+        return self.nodes
 
     def getCustomers(self):
         """Returns the list of nodes that represent customers, i.e. have a service time different from -1"""
