@@ -1,6 +1,6 @@
 # Author : Alexandre Dossin
 
-import graph, simplePaths, input
+import graph, simplePaths, input, display
 import random, math
 
 
@@ -77,10 +77,11 @@ def test2():
 def main():
     #test1()
     #test2()
-    numberOfCustomers = 1
+    numberOfCustomers = 5
     numberOfDepots = 2
+    maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
-        g = graph.buildGraph(numberOfCustomers, numberOfDepots, 1000)  # for testing
+        g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # for testing
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
     #print(g)
@@ -93,7 +94,13 @@ def main():
     input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
                                   droneSpeed=600, droneAutonomy=25, printStatistics=False)
 
-    #input.generateGENCOLInputFiles(5, 2, 10000)
+    displayBool = True
+    if displayBool:
+        root = display.Tk()
+        wdw = display.Window(root, g)
+        root.geometry("800x600+300+100")
+        root.mainloop()
+
 
 if __name__ == '__main__':
     main()
