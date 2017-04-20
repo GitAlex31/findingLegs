@@ -1,11 +1,9 @@
 # Author : Alexandre Dossin
 
 import graph, simplePaths, input, display
-import random, math
-
 
 def main():
-    
+
     numberOfCustomers = 5
     numberOfDepots = 2
     maxDistance = 1000  # in meters
@@ -18,7 +16,7 @@ def main():
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
     input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"
-    timeIntervals = [[0, 1440]] * numberOfDepots
+    timeIntervals = [[0, 1440]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
                                   droneSpeed=600, droneAutonomy=25, printStatistics=False)
