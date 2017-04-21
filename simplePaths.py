@@ -55,12 +55,10 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     printStatistics option True displays some statistics"""
 
-    depots = sorted(g.getDepots())  # the list is sorted because the node sequence is initially a set (unordered)
-
     allSimplePaths = []
 
-    depotsListForGraphExploration = [depot for depot in depots if depots.index(depot) % 2 == 0]
-    depotsListForSelfLoops = [depot for depot in depots if depots.index(depot) % 2 != 0]
+    depotsListForGraphExploration = g.getRealDepots()
+    depotsListForSelfLoops = g.getOtherDepots()
 
     for depot in depotsListForGraphExploration:  # simple paths between different depots
         for other in depotsListForGraphExploration:
