@@ -68,7 +68,9 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
                                                          [], [], droneSpeed, droneAutonomy))
 
     for depot in depotsListForSelfLoops:
-        allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), int(depot.getName()) - 1,  # real depot associated
+        # int(depot.getName()) - 1
+        associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
+        allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), associatedDepot.getName(),
                                                          [], [], droneSpeed, droneAutonomy))
 
     if printStatistics:  # useful statistics about the built graph

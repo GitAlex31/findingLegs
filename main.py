@@ -11,15 +11,15 @@ def main():
         g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # for testing
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
-    #print(g)
+    print(g)
     #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
     input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"
-    timeIntervals = [[0, 1440]] * numberOfDepots  # for the moment the time windows are not restrictive
+    timeIntervals = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, printStatistics=False)
+                                  droneSpeed=600, droneAutonomy=25, printStatistics=True)
 
     displayBool = False
     if displayBool:

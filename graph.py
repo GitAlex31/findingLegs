@@ -149,8 +149,16 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
         customers.append(Node(name, x, y, explorationTime))
 
     depots = []
-    name = numberOfCustomers+1
-    for i in range(numberOfCustomers+1, numberOfCustomers + numberOfDepots+1):
+
+    # first we add the central depot named "0"
+    # and depot named "numberOfCustomers + 1" its corresponding depot for self-loops paths
+    x = random.random() * maxDistance
+    y = random.random() * maxDistance
+    depots.append(Node(str(0), x, y, -1))
+    depots.append(Node(str(numberOfCustomers + 1), x, y, -1))
+
+    name = numberOfCustomers + 2  # names of the real depots other than the central depot
+    for i in range(numberOfCustomers+2, numberOfCustomers + numberOfDepots+1):
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
         depots.append(Node(str(name), x, y, -1))  # the depot has no exploration time : so -1 by default
@@ -183,8 +191,10 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
             g.addEdge(Edge(depot, customer))
 
         # index corresponding to the associated depot for graph exploration
-        correspondingDepotIdx = int(depot.getName()) - 1
+        #correspondingDepotIdx = int(depot.getName()) - 1
+        correspondingDepotIdx = g.getOtherDepots().index(depot)
 
-        g.addEdge(Edge(depot, g.getNode(correspondingDepotIdx)))
+        #g.addEdge(Edge(depot, g.getNode(correspondingDepotIdx)))
+        g.addEdge(Edge(depot, g.getRealDepots()[correspondingDepotIdx]))
 
     return g
