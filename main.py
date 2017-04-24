@@ -21,10 +21,10 @@ def main():
     input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
                                   droneSpeed=600, droneAutonomy=25, printStatistics=True)
 
-    displayBool = False
+    displayBool = True
     if displayBool:
         root = display.Tk()
-        wdw = display.Window(root, g)
+        wdw = display.Window(root, g, "test")
         root.geometry("800x600+300+100")
         root.mainloop()
 
