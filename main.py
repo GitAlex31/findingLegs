@@ -11,7 +11,7 @@ def main():
         g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # for testing
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
-    print(g)
+    #print(g)
     #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
     input.createInputFile(g, "clients.txt")
@@ -23,8 +23,9 @@ def main():
 
     displayBool = True
     if displayBool:
+        #display.solutionFileToRoutesList(g, "sol.txt")
         root = display.Tk()
-        wdw = display.Window(root, g, "test")
+        wdw = display.Window(root, g, "sol.txt")
         root.geometry("800x600+300+100")
         root.mainloop()
 
