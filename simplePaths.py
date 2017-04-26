@@ -1,5 +1,8 @@
 # Author : Alexandre Dossin
+
+import graph
 import math
+import itertools
 
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25):
     """Function that returns the list of all simple paths between node named s and node named t in graph g.
@@ -48,7 +51,40 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
                 currentPath.pop()
         pass
 
+    #print([[node.getName() for node in path] for path in simplePaths])
     return simplePaths
+
+def filterSimplePaths(g, simplePaths, droneSpeed=600):
+    """Returns a filtered list of simple paths consisting in keeping the simple paths of least cost only, e.g. 
+    keeping the simple path [1, 2, 3, 4] (say 1 and 4 are depots) instead of [1, 3, 2, 4] if the cost of that last
+    path is higher than the previous one."""
+
+    if len(g.getCustomers()) >= 2:  # the filter is useful in that case only
+        customers = g.getCustomers()
+        filteredSimplePaths = []
+        for i in range(2, len(customers) + 1):
+            targetSubsets = list(set(itertools.combinations(customers, i)))  # finds all subsets of size i of the customers set
+            #print(targetSubsets)
+            for targetSubset in targetSubsets:
+                #print(targetSubset)
+                simplePathsToFilter = [path for path in simplePaths if len(path) == i + 2 and set(targetSubset).issubset(path)]
+                #print("Target Subset : ", targetSubset[0], targetSubset[1])
+                #print([[node.getName() for node in path] for path in simplePathsToFilter])
+                #print(simplePathsToFilter)
+                #print(targetSubset)
+                if simplePathsToFilter != []:
+                    leastCostPath = simplePathsToFilter[0]  # initialization of the minimization small algorithm
+                    leastCostPathObject = graph.Path(leastCostPath)
+                    for path in simplePathsToFilter:  # we retain here the path corresponding to the minimum cost
+                        pathObject = graph.Path(path)
+                        if pathObject.computeLength(droneSpeed) < leastCostPathObject.computeLength(droneSpeed):
+                            leastCostPath = path
+                            leastCostPathObject = graph.Path(leastCostPath)
+
+                    filteredSimplePaths.append(leastCostPath)
+
+        return filteredSimplePaths
+
 
 def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g, 
@@ -63,15 +99,13 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
     for depot in depotsListForGraphExploration:  # simple paths between different depots
         for other in depotsListForGraphExploration:
             if depot != other:
-
-                allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), other.getName(),
-                                                         [], [], droneSpeed, droneAutonomy))
+                simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
+                allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
 
     for depot in depotsListForSelfLoops:
-        # int(depot.getName()) - 1
         associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
-        allSimplePaths.extend(exploreSimplePaths(g, depot.getName(), associatedDepot.getName(),
-                                                         [], [], droneSpeed, droneAutonomy))
+        simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
+        allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
 
     if printStatistics:  # useful statistics about the built graph
         numberOfCustomers = len(g.getCustomers())
