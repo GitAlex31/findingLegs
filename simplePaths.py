@@ -84,6 +84,8 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
                     filteredSimplePaths.append(leastCostPath)
 
         return filteredSimplePaths
+    else:
+        return simplePaths
 
 
 def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=False):
