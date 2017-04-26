@@ -109,8 +109,8 @@ class Digraph(object):
         return self.nodes
 
     def getCustomers(self):
-        """Returns the list of nodes that represent customers, i.e. have a service time different from -1"""
-        return [node for node in self.nodes if node.getServiceTime() != -1]
+        """Returns the sorted list of nodes that represent customers, i.e. have a service time different from -1"""
+        return sorted([node for node in self.nodes if node.getServiceTime() != -1])
 
     def getDepots(self):
         """Returns the list of nodes that represent depots, i.e. have a service time of -1"""
@@ -191,10 +191,8 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
             g.addEdge(Edge(depot, customer))
 
         # index corresponding to the associated depot for graph exploration
-        #correspondingDepotIdx = int(depot.getName()) - 1
         correspondingDepotIdx = g.getOtherDepots().index(depot)
 
-        #g.addEdge(Edge(depot, g.getNode(correspondingDepotIdx)))
         g.addEdge(Edge(depot, g.getRealDepots()[correspondingDepotIdx]))
 
     return g
