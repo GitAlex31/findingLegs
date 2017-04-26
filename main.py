@@ -12,18 +12,22 @@ def main():
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
     #print(g)
-    #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
-    #print([[node.getName() for node in trip] for trip in allSimplePaths])
-    input.createInputFile(g, "clients.txt")
+    #simplePathsTest = simplePaths.exploreSimplePaths(g, 0, 7)
+    #print([[node.getName() for node in trip] for trip in simplePathsTest])
+    #filteredSimplePaths = simplePaths.filterSimplePaths(g, simplePathsTest, droneSpeed=600)
+    #print([[node.getName() for node in path] for path in filteredSimplePaths])
+    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    print([[node.getName() for node in trip] for trip in allSimplePaths])
+
+    #input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"
     timeIntervals = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
-    input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, printStatistics=True)
+    #input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
+    #                              droneSpeed=600, droneAutonomy=25, printStatistics=True)
 
-    displayBool = True
+    displayBool = False
     if displayBool:
-        #display.solutionFileToRoutesList(g, "sol.txt")
         root = display.Tk()
         wdw = display.Window(root, g, "sol.txt")
         root.geometry("800x600+300+100")
