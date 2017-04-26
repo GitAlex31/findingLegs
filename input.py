@@ -23,13 +23,11 @@ def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, printStatisti
         leg_id = i
 
         if leg[0] in g.getOtherDepots():  # associate a real depot to the virtual one
-            #dep = g.getNode(int(leg[0].getName()) - 1)
             dep = g.getRealDepots()[g.getOtherDepots().index(leg[0])]
         else:
             dep = leg[0]
 
         if leg[-1] in g.getOtherDepots():
-            #dest = g.getNode(int(leg[-1].getName()) - 1)
             dest = g.getRealDepots()[g.getOtherDepots().index(leg[-1])]
         else:
             dest = leg[-1]
