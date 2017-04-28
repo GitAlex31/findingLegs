@@ -21,7 +21,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
             usedCapacity += currentPath[i].getServiceTime()
         usedCapacity += float(currentPath[i].computeDist(currentPath[i+1])) / droneSpeed
     # if the last node in currentPath is not a depot, we add its service time to the used capacity
-    # consider code to change if the depot have a non-negative service time
+    # consider changing the code if the depot have a non-negative service time
     if currentPath[-1].getServiceTime() != -1:
         usedCapacity += currentPath[-1].getServiceTime()
 
