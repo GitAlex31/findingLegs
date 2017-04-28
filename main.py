@@ -4,7 +4,7 @@ import graph, simplePaths, input, display
 
 def main():
 
-    numberOfCustomers = 1
+    numberOfCustomers = 100
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -16,15 +16,15 @@ def main():
     #print([[node.getName() for node in trip] for trip in simplePathsTest])
     #filteredSimplePaths = simplePaths.filterSimplePaths(g, simplePathsTest, droneSpeed=600)
     #print([[node.getName() for node in path] for path in filteredSimplePaths])
-    #allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
 
-    input.createInputFile(g, "clients.txt")
+    """input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"
     timeIntervals = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, printStatistics=True)
+                                  droneSpeed=600, droneAutonomy=25, printStatistics=True)"""
 
     displayBool = False
     if displayBool:

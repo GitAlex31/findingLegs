@@ -3,12 +3,9 @@
 from tkinter import Tk, Canvas, Frame, BOTH
 import re
 
-# Tk is the main window
-# A frame is a container
-# A canvas is an window on which we draw shapes
 
 def solutionFileToRoutesList(g, solutionFileName):
-    """Returns the list of performed routes based on the solution file.
+    """Returns the list of performed routes based on the GENCOL solution file.
      A route is defined by a sequence of nodes beginning by the Source node and ending with Destination node."""
     with open(solutionFileName, 'r') as file:
         routes = []
@@ -32,6 +29,9 @@ def solutionFileToRoutesList(g, solutionFileName):
 
     return routes
 
+# Tk is the main window
+# A frame is a container
+# A canvas is an window on which we draw shapes
 
 class Window(Frame):
 

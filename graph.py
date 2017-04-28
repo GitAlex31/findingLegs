@@ -1,7 +1,8 @@
 # Author : Alexandre Dossin
+
 import math, random
 
-"""graph.py contains the classes implementation"""
+# graph.py contains the classes implementation : Node, Edge, Path and Digraph classes
 
 class Node(object):
     def __init__(self, name, x, y, serviceTime=0):
@@ -51,7 +52,7 @@ class Edge(object):
 
 class Path(object):
     def __init__(self, nodesList):
-        """A path consist in an order list of nodes. The origin and destination nodes are not necessarily depots."""
+        """A path consist in an ordered list of nodes. The origin and destination nodes are not necessarily depots."""
         self.nodesList = nodesList
 
     def computeLength(self, speed):

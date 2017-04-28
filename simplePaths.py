@@ -61,21 +61,18 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
 
     if len(g.getCustomers()) >= 2:  # the filter is useful in that case only
         customers = g.getCustomers()
-        filteredSimplePaths = []
+        filteredSimplePaths = []  # initialization of the list containing the best simple paths between two depots
         for i in range(2, len(customers) + 1):
-            targetSubsets = list(set(itertools.combinations(customers, i)))  # finds all subsets of size i of the customers set
-            #print(targetSubsets)
+            # we find all unordered subsets of the customers set
+            targetSubsets = list(set(itertools.combinations(customers, i)))
             for targetSubset in targetSubsets:
-                #print(targetSubset)
+                # THE FOLLOWING COMPARISON IS STRONGLY COMBINATORIAL !
                 simplePathsToFilter = [path for path in simplePaths if len(path) == i + 2 and set(targetSubset).issubset(path)]
-                #print("Target Subset : ", targetSubset[0], targetSubset[1])
-                #print([[node.getName() for node in path] for path in simplePathsToFilter])
-                #print(simplePathsToFilter)
-                #print(targetSubset)
                 if simplePathsToFilter != []:
                     leastCostPath = simplePathsToFilter[0]  # initialization of the minimization small algorithm
                     leastCostPathObject = graph.Path(leastCostPath)
                     for path in simplePathsToFilter:  # we retain here the path corresponding to the minimum cost
+                        # linear complexity in the simplePathsToFilter list
                         pathObject = graph.Path(path)
                         if pathObject.computeLength(droneSpeed) < leastCostPathObject.computeLength(droneSpeed):
                             leastCostPath = path
@@ -102,12 +99,14 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
         for other in depotsListForGraphExploration:
             if depot != other:
                 simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
-                allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                allSimplePaths.extend(simplePaths)
+                #allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
 
     for depot in depotsListForSelfLoops:
         associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
         simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
-        allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+        allSimplePaths.extend(simplePaths)
+        #allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
 
     if printStatistics:  # useful statistics about the built graph
         numberOfCustomers = len(g.getCustomers())
