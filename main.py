@@ -1,10 +1,11 @@
 # Author : Alexandre Dossin
 
 import graph, simplePaths, input, display
+import time
 
 def main():
 
-    numberOfCustomers = 100
+    numberOfCustomers = 10
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -16,7 +17,7 @@ def main():
     #print([[node.getName() for node in trip] for trip in simplePathsTest])
     #filteredSimplePaths = simplePaths.filterSimplePaths(g, simplePathsTest, droneSpeed=600)
     #print([[node.getName() for node in path] for path in filteredSimplePaths])
-    allSimplePaths = simplePaths.exploreAllSimplePaths(g)
+    allSimplePaths = simplePaths.exploreAllSimplePaths(g, printStatistics=True)
     #print([[node.getName() for node in trip] for trip in allSimplePaths])
 
     """input.createInputFile(g, "clients.txt")
@@ -35,4 +36,6 @@ def main():
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     main()
+    print("\n Time used : --- %s seconds ---" % (time.time() - start_time))
