@@ -51,7 +51,6 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
                 currentPath.pop()
         pass
 
-    #print([[node.getName() for node in path] for path in simplePaths])
     return simplePaths
 
 def filterSimplePaths(g, simplePaths, droneSpeed=600):
