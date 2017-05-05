@@ -3,12 +3,12 @@
 import simplePaths
 import graph
 
-def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, printStatistics=False):
+def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=True, printStatistics=False):
     """Returns the input file that contains the list of legs.
     A leg is represented by an id, its cost, an origin and a destination depot and a list of visited customers.
     Not used by GENCOL but provides a more readable file for the user."""
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, printStatistics)
+    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
     myFile = open(fileName, "w")
     myFile.write("Number of customers: {}   Number of Depots: {}    Drone Autonomy: {} min  Drone Speed:{} m/min"
                  .format(len(g.getCustomers()), int(len(g.getDepots()) / 2), droneAutonomy, droneSpeed))
@@ -99,9 +99,9 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, printStatistics=False):
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, printStatistics)
+    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
 
     myFile = open(fileName, 'a')
     myFile.write("Arcs={\n")
@@ -127,7 +127,7 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, pri
         if len(leg) > 2:
             visitedNodesStr = "D" + " D".join([node.getName() for node in leg[1:-1]])
 
-        if not ((dep == dest) and visitedNodesStr == ""):  # we exclude the self-loops visiting no clients
+        if not ((dep == dest) and visitedNodesStr == ""):  # we exclude the self-loops visiting no clients TODO: we can do it while generating the legs
             myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
 
     # we then add the arcs needed for the modelling of the departure and come-back to the central depot

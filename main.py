@@ -5,7 +5,7 @@ import time
 
 def main():
 
-    numberOfCustomers = 15
+    numberOfCustomers = 40
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -13,17 +13,34 @@ def main():
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
     #print(g)
-    simplePathsTest = simplePaths.exploreSimplePaths(g, 0, 17)
-    print([[node.getName() for node in trip] for trip in simplePathsTest])
-    print(len(simplePathsTest))
+    #simplePathsTest = simplePaths.exploreSimplePaths(g, 3, 0)
+    #simplePathsTest = simplePaths.filterSimplePaths(g,simplePathsTest)
+    #print([[node.getName() for node in trip] for trip in simplePathsTest])
+    #print(len(simplePathsTest))
+    #simplePathsTest2 = simplePaths.exploreSimplePathsNonRecursive(g, 3, 0)
+    #print([[node.getName() for node in trip] for trip in simplePathsTest2])
+
+    #print(graph.Path([g.getNode(3), g.getNode(1), g.getNode(2), g.getNode(0)]).computeLength(600))
+    #print(graph.Path([g.getNode(3), g.getNode(2), g.getNode(1), g.getNode(0)]).computeLength(600))
+
+    #for path in simplePathsTest:
+    #    if path not in simplePathsTest2:
+            #print(path)
+    #        pass
+
+    #simplePathsTest = simplePaths.filterSimplePaths(g, simplePathsTest)
+    #print([[node.getName() for node in trip] for trip in simplePathsTest])
+    #print(len(simplePathsTest))
     #filteredSimplePaths = simplePaths.filterSimplePaths(g, simplePathsTest, droneSpeed=600)
     #print([[node.getName() for node in path] for path in filteredSimplePaths])
-    #allSimplePaths = simplePaths.exploreAllSimplePaths(g, printStatistics=True)
-    #print([[node.getName() for node in trip] for trip in allSimplePaths])
-    simplePathsTest = simplePaths.exploreSimplePathsNonRecursive(g, 0, 17)
-    print(len(simplePathsTest))
-    print([[node.getName() for node in trip] for trip in simplePathsTest])
 
+    #allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
+    #print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
+    allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)
+    #print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
+    #for path in allSimplePathsRecursive:
+        #if path not in allSimplePathsNonRecursive and len(path) >= 5:
+            #print([node.getName() for node in path])
 
     """input.createInputFile(g, "clients.txt")
     fileName = "input0.txt"

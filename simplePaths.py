@@ -62,7 +62,7 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
         customers = g.getCustomers()
         filteredSimplePaths = []  # initialization of the list containing the best simple paths between two depots
         #for i in range(2, len(customers) + 1):
-        for i in range(2, 5):
+        for i in range(0, 5):
             # we find all unordered subsets of the customers set
             targetSubsets = list(set(itertools.combinations(customers, i)))
             for targetSubset in targetSubsets:
@@ -85,7 +85,7 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
         return simplePaths
 
 
-def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
+def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):  # TODO : review function performance
     """Returns the list of least cost simple paths between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
@@ -95,7 +95,10 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
     simplePaths = []
     customers = g.getCustomers()
 
-    for i, customer in enumerate(customers):  # first we build legs with 1 customer only
+    if node_s.computeDist(node_t) <= droneAutonomy:  # first we build the inter-depots routes if possible
+        simplePaths.append([node_s, node_s])  # without any customer
+
+    for i, customer in enumerate(customers):  # we build legs with 1 customer only
         temporaryList = [node_s, customer, node_t]
         candidateRoute = graph.Path(temporaryList)
         candidateRouteLength = candidateRoute.computeLength(droneSpeed)
@@ -164,7 +167,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
 
     return simplePaths
 
-def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=False):
+def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g, 
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     printStatistics option True displays some statistics"""
@@ -179,15 +182,27 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
     for depot in depotsListForGraphExploration:  # simple paths between different depots
         for other in depotsListForGraphExploration:
             if depot != other:
-                simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
-                #allSimplePaths.extend(simplePaths)
-                allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                if recursiveAlgorithm:
+                    simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
+                    #allSimplePaths.extend(simplePaths)
+                    allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                else:
+                    simplePaths = exploreSimplePathsNonRecursive(g, depot.getName(), other.getName(), droneSpeed,
+                                                     droneAutonomy)
+                    allSimplePaths.extend(simplePaths)
 
     for depot in depotsListForSelfLoops:
+
         associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
-        simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
-        #allSimplePaths.extend(simplePaths)
-        allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+
+        if recursiveAlgorithm:
+            simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
+            #allSimplePaths.extend(simplePaths)
+            allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+        else:
+            simplePaths = exploreSimplePathsNonRecursive(g, depot.getName(), associatedDepot.getName(), droneSpeed,
+                                             droneAutonomy)
+            allSimplePaths.extend(simplePaths)
 
     if printStatistics:  # useful statistics about the built graph
         numberOfCustomers = len(g.getCustomers())
@@ -217,6 +232,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
         fracPaths = len(allSimplePaths) / totalNumberPaths
         print("Fraction of used paths : {} %".format(fracPaths * 100))
 
-    print("\n Time used for generating the legs() : --- %s seconds ---" % (time.time() - start_time))
+    print("\n Time used for generating the legs() : --- {} seconds --- with {} algorithm"
+          .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
 
     return allSimplePaths
