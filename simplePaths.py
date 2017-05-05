@@ -1,8 +1,7 @@
 # Author : Alexandre Dossin
 
 import graph
-import math
-import itertools
+import math, itertools, time
 
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25):
     """Function that returns the list of all simple paths between node named s and node named t in graph g.
@@ -53,6 +52,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
 
     return simplePaths
 
+
 def filterSimplePaths(g, simplePaths, droneSpeed=600):
     """Returns a filtered list of simple paths consisting in keeping the simple paths of least cost only, e.g. 
     keeping the simple path [1, 2, 3, 4] (say 1 and 4 are depots) instead of [1, 3, 2, 4] if the cost of that last
@@ -61,11 +61,12 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
     if len(g.getCustomers()) >= 2:  # the filter is useful in that case only
         customers = g.getCustomers()
         filteredSimplePaths = []  # initialization of the list containing the best simple paths between two depots
-        for i in range(2, len(customers) + 1):
+        #for i in range(2, len(customers) + 1):
+        for i in range(2, 5):
             # we find all unordered subsets of the customers set
             targetSubsets = list(set(itertools.combinations(customers, i)))
             for targetSubset in targetSubsets:
-                # THE FOLLOWING COMPARISON IS STRONGLY COMBINATORIAL !
+                # THERE IS AN FACTORIAL NUMBER OF TARGET SUBSETS !
                 simplePathsToFilter = [path for path in simplePaths if len(path) == i + 2 and set(targetSubset).issubset(path)]
                 if simplePathsToFilter != []:
                     leastCostPath = simplePathsToFilter[0]  # initialization of the minimization small algorithm
@@ -84,10 +85,91 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
         return simplePaths
 
 
+def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
+    """Returns the list of least cost simple paths between node named s and node named t in graph g.
+    s and t have to be different at the beginning."""
+
+    node_s = g.getNode(s)  # we get the node object from its name
+    node_t = g.getNode(t)
+
+    simplePaths = []
+    customers = g.getCustomers()
+
+    for i, customer in enumerate(customers):  # first we build legs with 1 customer only
+        temporaryList = [node_s, customer, node_t]
+        candidateRoute = graph.Path(temporaryList)
+        candidateRouteLength = candidateRoute.computeLength(droneSpeed)
+
+        if candidateRouteLength < droneAutonomy:
+
+            simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
+
+            for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
+
+                temporaryList2 = [customer, customer2]
+                permutations2 = list(itertools.permutations(temporaryList2))  # candidate routes with 2 customers
+                leastCostLeg = [node_s] + list(permutations2[0]) + [node_t]  # initialization of the least cost route
+                # filtering of the legs containing the same subset of customers by cost minimization
+                # the autonomy of the drone has to be respected
+                totalUnfeasibility2 = True
+                for perm2 in permutations2:
+                    legList = [node_s] + list(perm2) + [node_t]
+                    legPathObject = graph.Path(legList)
+                    if (legPathObject.computeLength(droneSpeed) <= graph.Path(leastCostLeg).computeLength(droneSpeed))\
+                            and (legPathObject.computeLength(droneSpeed) <= droneAutonomy):
+                        totalUnfeasibility2 = False
+                        leastCostLeg = [node_s] + list(perm2) + [node_t]
+
+                simplePaths.append(leastCostLeg)
+
+                if not totalUnfeasibility2:
+
+                    for k, customer3 in enumerate(customers[j+1:], start=j+1):  # now 3 customers in the route
+
+                        temporaryList3 = [customer, customer2, customer3]
+                        permutations3 = list(itertools.permutations(temporaryList3))  # candidate routes with 3 customers
+                        leastCostLeg = [node_s] + list(permutations3[0]) + [node_t]
+                        totalUnfeasibility3 = True
+                        for perm3 in permutations3:
+                            legList = [node_s] + list(perm3) + [node_t]
+                            legPathObject = graph.Path(legList)
+                            if (legPathObject.computeLength(droneSpeed) <= graph.Path(leastCostLeg).computeLength(
+                                    droneSpeed)) \
+                                    and (legPathObject.computeLength(droneSpeed) <= droneAutonomy):
+                                totalUnfeasibility3 = False
+                                leastCostLeg = [node_s] + list(perm3) + [node_t]
+
+                        simplePaths.append(leastCostLeg)
+
+                        if not totalUnfeasibility3:
+
+                            for l, customer4 in enumerate(customers[k+1:], start=k+1):  # now 4 customers in the route
+
+                                temporaryList = [customer, customer2, customer3, customer4]
+                                permutations4 = list(
+                                    itertools.permutations(temporaryList))  # candidate routes with 4 customers
+                                leastCostLeg = [node_s] + list(permutations4[0]) + [node_t]
+                                totalUnfeasibility4 = True
+                                for perm4 in permutations4:
+                                    legList = [node_s] + list(perm4) + [node_t]
+                                    legPathObject = graph.Path(legList)
+                                    if (legPathObject.computeLength(droneSpeed) <= graph.Path(
+                                            leastCostLeg).computeLength(
+                                            droneSpeed)) \
+                                            and (legPathObject.computeLength(droneSpeed) <= droneAutonomy):
+                                        totalUnfeasibility4 = False
+                                        leastCostLeg = [node_s] + list(perm4) + [node_t]
+
+                                simplePaths.append(leastCostLeg)
+
+    return simplePaths
+
 def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g, 
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     printStatistics option True displays some statistics"""
+
+    start_time = time.time()
 
     allSimplePaths = []
 
@@ -98,14 +180,14 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
         for other in depotsListForGraphExploration:
             if depot != other:
                 simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
-                allSimplePaths.extend(simplePaths)
-                #allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                #allSimplePaths.extend(simplePaths)
+                allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
 
     for depot in depotsListForSelfLoops:
         associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
         simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
-        allSimplePaths.extend(simplePaths)
-        #allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+        #allSimplePaths.extend(simplePaths)
+        allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
 
     if printStatistics:  # useful statistics about the built graph
         numberOfCustomers = len(g.getCustomers())
@@ -134,5 +216,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, printStatistics=F
         print("Total possible number of paths : {}".format(totalNumberPaths))
         fracPaths = len(allSimplePaths) / totalNumberPaths
         print("Fraction of used paths : {} %".format(fracPaths * 100))
+
+    print("\n Time used for generating the legs() : --- %s seconds ---" % (time.time() - start_time))
 
     return allSimplePaths
