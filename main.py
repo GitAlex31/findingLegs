@@ -5,7 +5,7 @@ import time
 
 def main():
 
-    numberOfCustomers = 40
+    numberOfCustomers = 2
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -36,18 +36,18 @@ def main():
 
     #allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
     #print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
-    allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)
+    #allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)
     #print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
     #for path in allSimplePathsRecursive:
         #if path not in allSimplePathsNonRecursive and len(path) >= 5:
             #print([node.getName() for node in path])
 
-    """input.createInputFile(g, "clients.txt")
+    input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=True)
     fileName = "input0.txt"
     timeIntervals = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, printStatistics=True)"""
+                                  droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
 
     displayBool = False
     if displayBool:

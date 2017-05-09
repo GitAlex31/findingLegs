@@ -158,7 +158,7 @@ def createGENCOLInputFileNetwork(fileName, g):
     myFile.write("\n};")
 
 def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, printStatistics=False):
+                                  droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
     """Creates the complete GENCOL input file"""
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
@@ -166,7 +166,7 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, printStatistics)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
     createGENCOLInputFileNetwork(fileName, g)
     pass
 

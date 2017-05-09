@@ -95,8 +95,8 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):  
     simplePaths = []
     customers = g.getCustomers()
 
-    if node_s.computeDist(node_t) <= droneAutonomy:  # first we build the inter-depots routes if possible
-        simplePaths.append([node_s, node_s])  # without any customer
+    if node_s.computeDist(node_t) / droneSpeed <= droneAutonomy:  # first we build the inter-depots routes if possible
+        simplePaths.append([node_s, node_t])  # without any customer
 
     for i, customer in enumerate(customers):  # we build legs with 1 customer only
         temporaryList = [node_s, customer, node_t]
