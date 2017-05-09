@@ -5,8 +5,8 @@ import time
 
 def main():
 
-    numberOfCustomers = 2
-    numberOfDepots = 2
+    numberOfCustomers = 10
+    numberOfDepots = 5
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
         g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # for testing
@@ -44,10 +44,11 @@ def main():
 
     input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=True)
     fileName = "input0.txt"
-    timeIntervals = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
+    #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
+    timeWindows = simplePaths.buildTimeWindows(numberOfDepots, separatedTW=True)
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
-    input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
+    input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows,
+                                 droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
 
     displayBool = False
     if displayBool:

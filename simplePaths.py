@@ -236,3 +236,17 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
           .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
 
     return allSimplePaths
+
+def buildTimeWindows(numberOfDepots, separatedTW=True, randomTW=False):
+    """Returns time windows for depots according to different options : 
+    separetedTW indicates time-windows form an equal partition of the whole day.
+    randomTW provides randomly chosen time windows during the whole day."""
+    timeWindows = []
+    if separatedTW:
+        timeStep = int(float(86400) / numberOfDepots)
+    if randomTW:
+        pass
+    for i in range(numberOfDepots):
+        timeWindows.append([timeStep * i, timeStep * (i+1)])
+
+    return timeWindows
