@@ -1,7 +1,7 @@
 # Author : Alexandre Dossin
 
 import graph
-import math, itertools, time
+import math, itertools, time, random
 
 def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25):
     """Function that returns the list of all simple paths between node named s and node named t in graph g.
@@ -167,6 +167,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):  
 
     return simplePaths
 
+
 def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g, 
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
@@ -237,16 +238,24 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
 
     return allSimplePaths
 
-def buildTimeWindows(numberOfDepots, separatedTW=True, randomTW=False):
+def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False):
     """Returns time windows for depots according to different options : 
     separetedTW indicates time-windows form an equal partition of the whole day.
     randomTW provides randomly chosen time windows during the whole day."""
     timeWindows = []
+
     if separatedTW:
         timeStep = int(float(86400) / numberOfDepots)
+        for i in range(numberOfDepots):
+            timeWindows.append([timeStep * i, timeStep * (i + 1)])
+
     if randomTW:
-        pass
-    for i in range(numberOfDepots):
-        timeWindows.append([timeStep * i, timeStep * (i+1)])
+        for i in range(numberOfDepots):
+            a = random.randint(0, 86400)
+            b = random.randint(0, 86400)
+            if b >= a:
+                timeWindows.append([a, b])
+            else:
+                timeWindows.append([b, a])
 
     return timeWindows
