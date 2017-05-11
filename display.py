@@ -72,9 +72,6 @@ class Window(Frame):
         route = solutionFileToRoutesList(g, self.solutionFileName)[0]
         print(route)
 
-        #canvas.create_line(15, 25, 200, 25)
-        #canvas.create_line(300, 35, 300, 200, dash=(4, 2))
-        #canvas.create_line((55, 85), (155, 85), (105, 180), (55, 85))
         for i in range(len(route)-1):
             canvas.create_line(tuple(i / 2 + 5 for i in route[i].getCoord()), tuple(i / 2 + 5 for i in route[i+1].getCoord()), arrow='last')
 
