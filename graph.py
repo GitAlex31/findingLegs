@@ -64,6 +64,15 @@ class Path(object):
             length += float(self.nodesList[i].computeDist(self.nodesList[i + 1])) / speed
         return length
 
+    def computeLengthWithDistanceMatrix(self, g, speed):
+        length = 0
+        for i in range(len(self.nodesList[:-1])):
+            if i != 0:
+                length += self.nodesList[i].getServiceTime()
+            length += g.distanceMatrix[i][i+1] / speed  # supposed to be faster because computeDist is less called
+        return length
+
+
 
 class Digraph(object):
 
@@ -71,6 +80,7 @@ class Digraph(object):
         """A digraph has got an set of nodes and a dictionary of edges, in the form of an adjacency list"""
         self.nodes = set([])  # a set in Python is an unordered collection of unique elements
         self.edges = {}
+        self.distanceMatrix = None  # initialisation of the distance matrix
 
     def addNode(self, node):
         """Adds node to the set of nodes and an empty list to the dictionary of edges with node key """
@@ -106,8 +116,8 @@ class Digraph(object):
             return list_aux[0]
 
     def getNodes(self):
-        """Returns the list of nodes, either a customer or a depot"""
-        return self.nodes
+        """Returns the sorted list of nodes, either a customer or a depot"""
+        return sorted(self.nodes)
 
     def getCustomers(self):
         """Returns the sorted list of nodes that represent customers, i.e. have a service time different from -1"""
@@ -139,6 +149,7 @@ class Digraph(object):
 def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):  # TODO : maxDistance should be an attribute of graph
     """Build graph g with user-defined parameter values and random positions for nodes.
     Trick used to allow for self-loops is the duplication of depots."""  # TODO : in fact the whole function should be in the class ?
+    random.seed(123)
 
     g = Digraph()
 
@@ -195,5 +206,7 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
         correspondingDepotIdx = g.getOtherDepots().index(depot)
 
         g.addEdge(Edge(depot, g.getRealDepots()[correspondingDepotIdx]))
+
+    g.distanceMatrix = [[node.computeDist(otherNode) for otherNode in g.getNodes()] for node in g.getNodes()]
 
     return g
