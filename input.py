@@ -169,16 +169,3 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
     createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
     createGENCOLInputFileNetwork(fileName, g)
     pass
-
-
-def generateGENCOLInputFiles(numberOfCustomers, numberOfDepots, fixedCost,
-                                  droneSpeed=600, droneAutonomy=25, printStatistics=False):
-
-    for i, customer in enumerate(range(1, numberOfCustomers + 1)):
-        for j, depot in enumerate(range(2, numberOfDepots + 1)):
-            g = graph.buildGraph(customer, depot, maxDistance=1000, explorationTime=5)
-            timeIntervals = [[0, 1440]] * numberOfDepots
-            createCompleteGENCOLInputFile("input{}_{}.txt".format(customer, depot), g, fixedCost,
-                                          timeIntervals, droneSpeed, droneAutonomy, printStatistics)
-
-    pass
