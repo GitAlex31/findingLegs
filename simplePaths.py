@@ -261,4 +261,5 @@ def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=
         for i in range(numberOfDepots):
             start = random.randint(0, 86400)
             timeWindows.append([start, start + 300])  # a time window of 5 minutes is considered tight
+
     return timeWindows

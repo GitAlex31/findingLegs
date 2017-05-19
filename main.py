@@ -5,7 +5,7 @@ import time
 
 def main():
 
-    numberOfCustomers = 3
+    numberOfCustomers = 2
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -20,13 +20,14 @@ def main():
     #print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
 
     #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
-    fileName = "input0.txt"
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
+    fileName = "input{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
     #print(timeWindows)
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
-    input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows,
-                                 droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
+    #input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows,
+     #                            droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
+    input.createCompleteGENCOLInputFileWithoutLegs(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=600, droneAutonomy=25)
 
     displayBool = False
     if displayBool:
