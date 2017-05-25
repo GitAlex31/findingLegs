@@ -1,12 +1,14 @@
 # Author : Alexandre Dossin
 
 from tkinter import Tk, Canvas, Frame, BOTH
-import re
+import re  # stands for "regular expression" operations
+import pickle
 
 
-def solutionFileToRoutesList(g, solutionFileName):
-    """Returns the list of performed routes based on the GENCOL solution file.
+def solutionFileToRoutesList(g, solutionFileName):  #TODO : not functionnal when nodes with double digits numbers
+    """Returns a list of performed routes based on the GENCOL solution file.
      A route is defined by a sequence of nodes beginning by the Source node and ending with Destination node."""
+
     with open(solutionFileName, 'r') as file:
         routes = []
         copy = False
@@ -18,12 +20,12 @@ def solutionFileToRoutesList(g, solutionFileName):
                 copy = False
                 route = []
                 for nodes in route_aux:
-                    for node in nodes.strip():
+                    for node in nodes.strip().split():  # nodes.strip().split() is the list of nodes names
                         route.append(node)
                 route = [node for node in route if node != ' ']
                 routes.append(route)
             elif copy:
-                route_aux.append(re.sub("[^0-9]", " ", line.strip()))  # we remove the useless characters
+                route_aux.append(re.sub("[^0-9]", " ", line.strip()))  # we remove the useless characters and keep only the node numbers
 
     routes = [[g.getNode(name) for name in route] for route in routes]
 
@@ -31,7 +33,7 @@ def solutionFileToRoutesList(g, solutionFileName):
 
 # Tk is the main window
 # A frame is a container
-# A canvas is an window on which we draw shapes
+# A canvas is a window on which we draw shapes
 
 class Window(Frame):
 
@@ -54,29 +56,38 @@ class Window(Frame):
         for customer in self.customers:
             x = customer.getCoord()[0] / 2
             y = customer.getCoord()[1] / 2
-            #print(x, y)
+
             size = 10
             canvas.create_oval(x, y, x + size, y + size)
 
         for depot in self.depots:
             x = depot.getCoord()[0] / 2
             y = depot.getCoord()[1] / 2
-            print(x, y)
             size = 10
+
             if depot.getName() == '0':
                 canvas.create_rectangle(x, y, x + size, y + size, fill='blue')
             else:
                 canvas.create_rectangle(x, y, x + size, y + size)
 
+        routes = solutionFileToRoutesList(g, self.solutionFileName)
 
-        route = solutionFileToRoutesList(g, self.solutionFileName)[0]
-        print(route)
-
-        for i in range(len(route)-1):
-            canvas.create_line(tuple(i / 2 + 5 for i in route[i].getCoord()), tuple(i / 2 + 5 for i in route[i+1].getCoord()), arrow='last')
+        for route in routes:
+            for i in range(len(route)-1):
+                canvas.create_line(tuple(i / 2 + 5 for i in route[i].getCoord()),
+                                   tuple(i / 2 + 5 for i in route[i+1].getCoord()), arrow='last')
 
         canvas.pack(fill=BOTH, expand=1)
 
-def displayRoutes(g, solutionFileName):
-    """Creates a TkInter display with customers, depots and routes."""
-    pass
+if __name__== '__main__':
+    GENCOLSolutionFileName = input("Please enter GENCOL solution file name :")
+    GENCOLSolutionFileName = "../output/" + GENCOLSolutionFileName
+    g = pickle.load(open("../temp/graph.p", "rb"))
+
+    root = Tk()
+    try:
+        window = Window(root, g, GENCOLSolutionFileName)
+    except FileNotFoundError:
+        print("File not present. Please enter again the file.")
+    root.geometry("800x600+300+100")
+    root.mainloop()

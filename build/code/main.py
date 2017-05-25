@@ -1,15 +1,16 @@
 # Author : Alexandre Dossin
 
 import graph, simplePaths, inputWithLegs, inputWithoutLegs, display
-import time
+import time, pickle
 
 def main():
 
-    numberOfCustomers = 7
+    numberOfCustomers = 13
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
-        g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # for testing
+        g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance)  # building a random graph
+        pickle.dump(g, open("../temp/graph.p", "wb"))
     else:
         raise ValueError("The network must have at least 1 customer and 2 depots.")
 
@@ -35,8 +36,12 @@ def main():
 
     displayRoutes = False
     if displayRoutes:
+        GENCOLsolutionFileName = fileName.replace("input", "problem")
+        GENCOLsolutionFileName = GENCOLsolutionFileName.replace(".txt", ".out")
+        GENCOLsolutionFileName = "../output/" + GENCOLsolutionFileName
         root = display.Tk()
-        wdw = display.Window(root, g, "sol.txt")
+        window = display.Window(root, g, GENCOLsolutionFileName)
+        print(fileName)
         root.geometry("800x600+300+100")
         root.mainloop()
 
