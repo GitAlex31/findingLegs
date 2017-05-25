@@ -1,11 +1,11 @@
 # Author : Alexandre Dossin
 
-import graph, simplePaths, input, display
+import graph, simplePaths, inputWithLegs, inputWithoutLegs, display
 import time
 
 def main():
 
-    numberOfCustomers = 1
+    numberOfCustomers = 10
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -26,11 +26,11 @@ def main():
     if generateInputFileWithLegs:
         fileName = "input{}_{}_{}.txt".format(numberOfCustomers, numberOfDepots, "tight5")
         # input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
-        input.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows,
+        inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows,
                                             droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
     else:
         fileName = "input{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
-        input.createCompleteGENCOLInputFileWithoutLegs(fileName, g, fixedCost, timeWindows, serviceTime=5,
+        inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5,
                                                        droneSpeed=600, droneAutonomy=25)
 
     displayRoutes = False
