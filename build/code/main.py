@@ -5,7 +5,7 @@ import time
 
 def main():
 
-    numberOfCustomers = 10
+    numberOfCustomers = 7
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:

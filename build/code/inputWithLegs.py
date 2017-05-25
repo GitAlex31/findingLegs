@@ -9,6 +9,7 @@ def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAlgo
     Not used by GENCOL but provides a more readable file for the user."""
 
     simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+    fileName = "../output/" + fileName  # builds the input file into the right directory
     myFile = open(fileName, "w")
     myFile.write("Number of customers: {}   Number of Depots: {}    Drone Autonomy: {} min  Drone Speed:{} m/min"
                  .format(len(g.getCustomers()), int(len(g.getDepots()) / 2), droneAutonomy, droneSpeed))
@@ -162,6 +163,7 @@ def createGENCOLInputFileNetwork(fileName, g):
 def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
                                   droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
     """Creates the complete GENCOL input file"""
+    fileName = "../output/" + fileName  # builds the gencol input file into the right directory
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
     createGENCOLInputFileRows(fileName, g)

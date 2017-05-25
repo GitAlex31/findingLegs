@@ -1,52 +1,5 @@
 # Author : Alexandre Dossin
 
-import simplePaths
-import graph
-
-def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=True, printStatistics=False):
-    """Returns the input file that contains the list of legs.
-    A leg is represented by an id, its cost, an origin and a destination depot and a list of visited customers.
-    Not used by GENCOL but provides a more readable file for the user."""
-
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
-    myFile = open(fileName, "w")
-    myFile.write("Number of customers: {}   Number of Depots: {}    Drone Autonomy: {} min  Drone Speed:{} m/min"
-                 .format(len(g.getCustomers()), int(len(g.getDepots()) / 2), droneAutonomy, droneSpeed))
-    myFile.write('\n \n')
-
-    # description of the columns
-    myFile.write("leg_id    time    originDepot destinationDepot    visitedNodes")
-    myFile.write('\n')
-
-    # filling the file with legs
-    for i, leg in enumerate(simplePathsList):
-        leg_id = i
-
-        if leg[0] in g.getOtherDepots():  # associate a real depot to the virtual one
-            dep = g.getRealDepots()[g.getOtherDepots().index(leg[0])]
-        else:
-            dep = leg[0]
-
-        if leg[-1] in g.getOtherDepots():
-            dest = g.getRealDepots()[g.getOtherDepots().index(leg[-1])]
-        else:
-            dest = leg[-1]
-
-        legObject = graph.Path(leg)  # more OOP way
-
-        # converting time from minutes to seconds for more precision
-        time = int(legObject.computeLength(droneSpeed) * 60)
-
-        visitedNodesStr = str()
-        if len(leg) > 2:
-            visitedNodesStr = " ".join([node.getName() for node in leg[1:-1]])
-
-
-        myFile.write(str(leg_id) + '        ' + str(round(time, 1)) + '         ' + str(dep.getName())
-                     + '           ' + str(dest.getName()) + '                   '
-                     '[' + visitedNodesStr + ']')
-        myFile.write('\n')
-    pass
 
 def createGENCOLInputFile(fileName):
     myFile = open(fileName, 'w')
@@ -155,6 +108,7 @@ def createGENCOLInputFileNetwork(fileName, g):
 def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime,
                                              droneSpeed=600, droneAutonomy=25):
     """Creates the comple GENCOL input file without generating the legs"""
+    fileName = "../output/" + fileName  # builds the gencol input file into the right directory
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
     createGENCOLInputFileRows(fileName, g)
