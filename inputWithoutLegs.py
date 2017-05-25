@@ -54,11 +54,6 @@ def createGENCOLInputFile(fileName):
 
 def createGENCOLInputFileResources(fileName):
     myFile = open(fileName, 'a')
-    myFile.write("Resources={\nTime Strong;\n};\n\n")
-    pass
-
-def createPureGENCOLInputFileResources(fileName):
-    myFile = open(fileName, 'a')
     myFile.write("Resources={\nTime Strong;\nAutonomy Strong;\n};\n\n")
     pass
 
@@ -85,26 +80,8 @@ def createGENCOLInputFileColumns(fileName, fixedCost):
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileNodes(fileName, g, timeIntervals):
-    myFile = open(fileName, 'a')
-    myFile.write("Nodes={\n")
 
-    numberOfCustomers = len(g.getCustomers())
-
-    #myFile.write("N{}dep [0 0];\n".format(str(numberOfCustomers)))
-    myFile.write("Source [0 0];\n")
-
-    for i, depot in enumerate(g.getRealDepots()):
-        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
-        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
-
-    #myFile.write("N{}arr [0 1440];\n".format(str(numberOfCustomers + 1)))
-    myFile.write("Destination [0 86400];\n")
-
-    myFile.write("};\n\n")
-    pass
-
-def createPureGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy=25):
+def createGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy=25):
     myFile = open(fileName, 'a')
     myFile.write("Nodes={\n")
 
@@ -124,55 +101,8 @@ def createPureGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy=25)
     myFile.write("};\n\n")
     pass
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
-
-    myFile = open(fileName, 'a')
-    myFile.write("Arcs={\n")
-
-    for leg in simplePathsList:
-
-        if leg[0] in g.getOtherDepots():  # associate a real depot to the virtual one
-            dep = g.getRealDepots()[g.getOtherDepots().index(leg[0])]
-        else:
-            dep = leg[0]
-
-        if leg[-1] in g.getOtherDepots():
-            dest = g.getRealDepots()[g.getOtherDepots().index(leg[-1])]
-        else:
-            dest = leg[-1]
-
-        legObject = graph.Path(leg)  # more OOP way
-
-        # converting time from minutes to seconds for more precision
-        time = int(legObject.computeLength(droneSpeed) * 60)
-
-        visitedNodesStr = str()
-        if len(leg) > 2:
-            visitedNodesStr = "D" + " D".join([node.getName() for node in leg[1:-1]])
-
-        if not ((dep == dest) and visitedNodesStr == ""):  # we exclude the self-loops visiting no clients TODO: we can do it while generating the legs
-            myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
-
-    # we then add the arcs needed for the modelling of the departure and come-back to the central depot
-    # first we do that for the Source
-    myFile.write("Source N0dep 0 [0] (RowVeh -1);\n")
-    # then for the Destination
-    myFile.write("N0arr Destination 0 [0];\n")
-    for depot in g.getRealDepots()[1:]:  # we exclude the source depot whose arc has already been written
-        time = int(depot.computeDist(g.getNode(0)) / droneSpeed * 60)  # similar to computeLength method of Path class
-        myFile.write("N{0}arr Destination {1} [{1}];\n".format(depot.getName(), time))
-
-    # finally we add the arc corresponding to the battery charging that we initialize to zero for the moment
-    for depot in g.getRealDepots():
-        myFile.write("N{0}arr N{0}dep 0 [0];\n".format(depot.getName()))
-
-    myFile.write("};\n\n")
-
-    pass
-
-def createPureGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAutonomy=25):
+def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAutonomy=25):
 
     myFile = open(fileName, 'a')
     myFile.write("Arcs={\n")
@@ -221,28 +151,16 @@ def createGENCOLInputFileNetwork(fileName, g):
     myFile.write("Net Source (Destination);")
     myFile.write("\n};")
 
-def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
-    """Creates the complete GENCOL input file"""
+
+def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime,
+                                             droneSpeed=600, droneAutonomy=25):
+    """Creates the comple GENCOL input file without generating the legs"""
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
     createGENCOLInputFileRows(fileName, g)
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
-    createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
-    createGENCOLInputFileNetwork(fileName, g)
-    pass
-
-def createCompleteGENCOLInputFileWithoutLegs(fileName, g, fixedCost, timeIntervals, serviceTime,
-                                             droneSpeed=600, droneAutonomy=25):
-    """Creates the comple GENCOL input file without generating the legs"""
-    createGENCOLInputFile(fileName)
-    createPureGENCOLInputFileResources(fileName)
-    createGENCOLInputFileRows(fileName, g)
-    createGENCOLInputFileTasks(fileName, g)
-    createGENCOLInputFileColumns(fileName, fixedCost)
-    createPureGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy)
-    createPureGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed, droneAutonomy)
+    createGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy)
+    createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed, droneAutonomy)
     createGENCOLInputFileNetwork(fileName, g)
     pass
