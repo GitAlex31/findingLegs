@@ -3,10 +3,11 @@
 import simplePaths
 import graph
 
-def createInputFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=True, printStatistics=False):
-    """Returns the input file that contains the list of legs.
-    A leg is represented by an id, its cost, an origin and a destination depot and a list of visited customers.
-    Not used by GENCOL but provides a more readable file for the user."""
+def createSummaryFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=True, printStatistics=False):
+    """Returns a text file that contains the list of legs with all the neecessary information.
+    A leg is represented by a unique id, its time of travel, origin and a destination depots, and the
+    list of its visited customers or sites.
+    Beware : the returned text is only informative but not used by GENCOL or other program in any way."""
 
     simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
     fileName = "../output/" + fileName  # builds the input file into the right directory
@@ -102,7 +103,8 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25,
+                              recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False):
 
     simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
 
@@ -131,45 +133,87 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
             visitedNodesStr = "D" + " D".join([node.getName() for node in leg[1:-1]])
 
         if not ((dep == dest) and visitedNodesStr == ""):  # we exclude the self-loops visiting no clients TODO: we can do it while generating the legs
-            myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
+            if VrpGencolFormatting:
+                myFile.write("N{} N{} {} as [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time,
+                                                            visitedNodesStr))
+            else:
+                myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
 
     # we then add the arcs needed for the modelling of the departure and come-back to the central depot
-    # first we do that for the Source
-    myFile.write("Source N0dep 0 [0] (RowVeh -1);\n")
-    # then for the Destination
-    myFile.write("N0arr Destination 0 [0];\n")
+    if VrpGencolFormatting:
+        # first we do that for the Source
+        myFile.write("Source N0dep 0 as [0] (RowVeh -1);\n")
+        # then for the Destination
+        myFile.write("N0arr Destination 0 as [0];\n")
+    else:
+        myFile.write("Source N0dep 0 [0] (RowVeh -1);\n")
+        myFile.write("N0arr Destination 0 [0];\n")
+
     for depot in g.getRealDepots()[1:]:  # we exclude the source depot whose arc has already been written
         time = int(depot.computeDist(g.getNode(0)) / droneSpeed * 60)  # similar to computeLength method of Path class
-        myFile.write("N{0}arr Destination {1} [{1}];\n".format(depot.getName(), time))
+        if VrpGencolFormatting:
+            myFile.write("N{0}arr Destination {1} as [{1}];\n".format(depot.getName(), time))
+        else:
+            myFile.write("N{0}arr Destination {1} [{1}];\n".format(depot.getName(), time))
 
     # finally we add the arc corresponding to the battery charging that we initialize to zero for the moment
     for depot in g.getRealDepots():
-        myFile.write("N{0}arr N{0}dep 0 [0];\n".format(depot.getName()))
+        if VrpGencolFormatting:
+            myFile.write("N{0}arr N{0}dep 0 as [0];\n".format(depot.getName()))
+        else:
+            myFile.write("N{0}arr N{0}dep 0 [0];\n".format(depot.getName()))
 
     myFile.write("};\n\n")
 
     pass
 
 
-def createGENCOLInputFileNetwork(fileName, g):
+def createGENCOLInputFileNetwork(fileName):
     myFile = open(fileName, 'a')
     myFile.write("Networks={\n")
-
-    numbersOfCustomers = len(g.getCustomers())
-
     myFile.write("Net Source (Destination);")
     myFile.write("\n};")
 
-def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals,
-                                  droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
-    """Creates the complete GENCOL input file"""
-    fileName = "../output/" + fileName  # builds the gencol input file into the right directory
+
+def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
+                                  recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False):
+    """Creates the complete GENCOL input file used by GENCOL to solve the VRP-TW"""
+    fileName = "../output/" + fileName  # builds the GENCOL input file into the right directory
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
     createGENCOLInputFileRows(fileName, g)
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
-    createGENCOLInputFileNetwork(fileName, g)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics, VrpGencolFormatting)
+    createGENCOLInputFileNetwork(fileName)
+    pass
+
+
+def createVrpGENCOLFileArcSets(fileName):
+    myFile = open(fileName, 'a')
+    myFile.write("ArcSets={\n")
+    myFile.write("as;\n")
+    myFile.write("\n};")
+
+def createVrpGENCOLInputFileNetwork(fileName):
+    myFile = open(fileName, 'a')
+    myFile.write("Networks={\n")
+    myFile.write("Net Source (Destination) (as);")
+    myFile.write("\n};")
+
+
+def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
+                                     recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=True):
+    """Creates the VrpGENCOL input file used by VrpGencol to solve the VRP-TW"""
+    fileName = "../output/" + fileName  # builds the VrpGencol input file into the right directory
+    createGENCOLInputFile(fileName)
+    createGENCOLInputFileResources(fileName)
+    createGENCOLInputFileRows(fileName, g)
+    createGENCOLInputFileTasks(fileName, g)
+    createGENCOLInputFileColumns(fileName, fixedCost)
+    createGENCOLInputFileNodes(fileName, g, timeIntervals)
+    createVrpGENCOLFileArcSets(fileName)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics, VrpGencolFormatting)
+    createVrpGENCOLInputFileNetwork(fileName)
     pass

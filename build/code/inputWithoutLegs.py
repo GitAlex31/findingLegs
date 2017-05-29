@@ -55,7 +55,7 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy=25):
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAutonomy=25):
+def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAutonomy=25, VrpGencolFormatting=False):
 
     myFile = open(fileName, 'a')
     myFile.write("Arcs={\n")
@@ -63,50 +63,66 @@ def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAut
     droneAutonomy *= 60  # converting minutes to seconds
     serviceTime *= 60
 
-    myFile.write("Source N0dep 0 [0 0] (RowVeh -1);\n")
+    if VrpGencolFormatting:
+        myFile.write("Source N0dep 0 as [0 0] (RowVeh -1);\n")
+    else:
+        myFile.write("Source N0dep 0 [0 0] (RowVeh -1);\n")
 
     for customer in g.getCustomers():  # writing rows between customers
         for otherCustomer in g.getCustomers():
             if customer != otherCustomer:
                 time = int((g.distanceMatrix[int(customer.getName())][int(otherCustomer.getName())] / droneSpeed) * 60)
-                myFile.write("C{0} C{1} {2} [{2} {2}];\n".format(customer.getName(), otherCustomer.getName(), time + serviceTime))
+                if VrpGencolFormatting:
+                    myFile.write("C{0} C{1} {2} as [{2} {2}];\n".format(customer.getName(), otherCustomer.getName(), time + serviceTime))
+                else:
+                    myFile.write("C{0} C{1} {2} [{2} {2}];\n".format(customer.getName(), otherCustomer.getName(), time + serviceTime))
 
     for depot in g.getRealDepots():  # writing rows between depots
         for otherDepot in g.getRealDepots():
             if depot != otherDepot:
                 time = int((g.distanceMatrix[int(depot.getName())][int(otherDepot.getName())] / droneSpeed) * 60)
-                myFile.write("N{0}dep N{1}arr {2} [{2} {2}];\n".format(depot.getName(), otherDepot.getName(), time))
+                if VrpGencolFormatting:
+                    myFile.write("N{0}dep N{1}arr {2} as [{2} {2}];\n".format(depot.getName(), otherDepot.getName(), time))
+                else:
+                    myFile.write("N{0}dep N{1}arr {2} [{2} {2}];\n".format(depot.getName(), otherDepot.getName(), time))
 
     for depot in g.getRealDepots():  # writing rows for the charging at the different stations
         chargingTime = 0  # in the first place we put a 0 charging time
-        myFile.write("N{0}arr N{0}dep {1} [{1} {2}];\n".format(depot.getName(), chargingTime, "-" + str(droneAutonomy)))
+        if VrpGencolFormatting:
+            myFile.write("N{0}arr N{0}dep {1} as [{1} {2}];\n".format(depot.getName(), chargingTime, "-" + str(droneAutonomy)))
+        else:
+            myFile.write("N{0}arr N{0}dep {1} [{1} {2}];\n".format(depot.getName(), chargingTime, "-" + str(droneAutonomy)))
 
     for customer in g.getCustomers():  # writing rows between customers and depots
         for depot in g.getRealDepots():
             time = int((g.distanceMatrix[int(customer.getName())][int(depot.getName())] / droneSpeed) * 60)
             # service time is taken into account the last visited node only
-            myFile.write("C{0} N{1}arr {2} [{2} {2}];\n".format(customer.getName(), depot.getName(), time))
-            myFile.write("N{0}dep C{1} {2} [{2} {2}];\n".format(depot.getName(), customer.getName(), time + serviceTime))
+            if VrpGencolFormatting:
+                myFile.write("C{0} N{1}arr {2} as [{2} {2}];\n".format(customer.getName(), depot.getName(), time))
+                myFile.write("N{0}dep C{1} {2} as [{2} {2}];\n".format(depot.getName(), customer.getName(), time + serviceTime))
+            else:
+                myFile.write("C{0} N{1}arr {2} [{2} {2}];\n".format(customer.getName(), depot.getName(), time))
+                myFile.write("N{0}dep C{1} {2} [{2} {2}];\n".format(depot.getName(), customer.getName(), time + serviceTime))
 
     for depot in g.getRealDepots():  # writing rows between depots and Destination
         time = int((g.distanceMatrix[0][int(depot.getName())] / droneSpeed) * 60)
-        myFile.write("N{0}arr Destination {1} [{1} {1}];\n".format(depot.getName(), time))
+        if VrpGencolFormatting:
+            myFile.write("N{0}arr Destination {1} as [{1} {1}];\n".format(depot.getName(), time))
+        else:
+            myFile.write("N{0}arr Destination {1} [{1} {1}];\n".format(depot.getName(), time))
     myFile.write("};\n\n")
 
     pass
 
-def createGENCOLInputFileNetwork(fileName, g):
+def createGENCOLInputFileNetwork(fileName):
     myFile = open(fileName, 'a')
     myFile.write("Networks={\n")
-
-    numbersOfCustomers = len(g.getCustomers())
-
     myFile.write("Net Source (Destination);")
     myFile.write("\n};")
 
 
 def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime,
-                                             droneSpeed=600, droneAutonomy=25):
+                                             droneSpeed=600, droneAutonomy=25, VrpGencolFormatting=False):
     """Creates the comple GENCOL input file without generating the legs"""
     fileName = "../output/" + fileName  # builds the gencol input file into the right directory
     createGENCOLInputFile(fileName)
@@ -115,6 +131,33 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, service
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy)
-    createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed, droneAutonomy)
-    createGENCOLInputFileNetwork(fileName, g)
+    createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed, droneAutonomy, VrpGencolFormatting)
+    createGENCOLInputFileNetwork(fileName)
+    pass
+
+def createVrpGENCOLFileArcSets(fileName):
+    myFile = open(fileName, 'a')
+    myFile.write("ArcSets={\n")
+    myFile.write("as;\n")
+    myFile.write("\n};")
+
+def createVrpGENCOLInputFileNetwork(fileName):
+    myFile = open(fileName, 'a')
+    myFile.write("Networks={\n")
+    myFile.write("Net Source (Destination) (as);")
+    myFile.write("\n};")
+
+def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime,
+                                             droneSpeed=600, droneAutonomy=25, VrpGencolFormatting=True):
+    """Creates the comple GENCOL input file without generating the legs"""
+    fileName = "../output/" + fileName  # builds the gencol input file into the right directory
+    createGENCOLInputFile(fileName)
+    createGENCOLInputFileResources(fileName)
+    createGENCOLInputFileRows(fileName, g)
+    createGENCOLInputFileTasks(fileName, g)
+    createGENCOLInputFileColumns(fileName, fixedCost)
+    createGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy)
+    createVrpGENCOLFileArcSets(fileName)
+    createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed, droneAutonomy, VrpGencolFormatting)
+    createVrpGENCOLInputFileNetwork(fileName)
     pass
