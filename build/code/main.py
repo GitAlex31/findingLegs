@@ -34,17 +34,6 @@ def main():
         inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5,
                                                        droneSpeed=600, droneAutonomy=25)
 
-    displayRoutes = False
-    if displayRoutes:
-        GENCOLsolutionFileName = fileName.replace("input", "problem")
-        GENCOLsolutionFileName = GENCOLsolutionFileName.replace(".txt", ".out")
-        GENCOLsolutionFileName = "../output/" + GENCOLsolutionFileName
-        root = display.Tk()
-        window = display.Window(root, g, GENCOLsolutionFileName)
-        print(fileName)
-        root.geometry("800x600+300+100")
-        root.mainloop()
-
 
 if __name__ == '__main__':
     start_time = time.time()
