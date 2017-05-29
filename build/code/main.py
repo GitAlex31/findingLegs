@@ -21,8 +21,8 @@ def main():
     #print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
 
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
-    generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
-    generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
+    generateInputFileWithLegs = False  # boolean used to decide if the input files are generated with the the legs enumeration or not
+    generateInputFileForVrpGencol = False  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     if generateInputFileWithLegs:
@@ -40,9 +40,9 @@ def main():
             inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
     else:
         if generateInputFileForVrpGencol:
-            fileName = "input{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
-        else:
             fileName = "inputVrp{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
+        else:
+            fileName = "input{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
 
         if generateInputFileForVrpGencol:
             inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=600, droneAutonomy=25)
