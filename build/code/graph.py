@@ -16,10 +16,10 @@ class Node(object):
         return self.name
     def getServiceTime(self):
         return self.serviceTime
-    def getCoord(self):
+    def getCoordinates(self):
         return (self.x, self.y)
 
-    def computeDist(self, other):
+    def computeDistance(self, other):
         """Returns the euclidian distance between two node"""
         return math.sqrt(math.pow(self.x - other.x, 2) + math.pow(self.y - other.y, 2))
 
@@ -38,7 +38,7 @@ class Edge(object):
         """An edge has two attributes : its source and destination nodes"""
         self.src = src
         self.dest = dest
-        self.dist = Node.computeDist(self.src, self.dest)  # the distance is computed internally
+        self.dist = Node.computeDistance(self.src, self.dest)  # the distance is computed internally
 
     def getSource(self):
         return self.src
@@ -61,7 +61,7 @@ class Path(object):
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
                 length += self.nodesList[i].getServiceTime()
-            length += float(self.nodesList[i].computeDist(self.nodesList[i + 1])) / speed
+            length += float(self.nodesList[i].computeDistance(self.nodesList[i + 1])) / speed
         return length
 
     def computeLengthWithDistanceMatrix(self, g, speed):
@@ -69,7 +69,7 @@ class Path(object):
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
                 length += self.nodesList[i].getServiceTime()
-            length += g.distanceMatrix[i][i+1] / speed  # supposed to be faster because computeDist is less called
+            length += g.distanceMatrix[int(self.nodesList[i].getName())][int(self.nodesList[i+1].getName())] / speed  # supposed to be faster because computeDistance is less called
         return length
 
 
@@ -80,7 +80,7 @@ class Digraph(object):
         """A digraph has got an set of nodes and a dictionary of edges, in the form of an adjacency list"""
         self.nodes = set([])  # a set in Python is an unordered collection of unique elements
         self.edges = {}
-        self.distanceMatrix = None  # initialisation of the distance matrix
+        self.distanceMatrix = None  # initialization of the distance matrix
 
     def addNode(self, node):
         """Adds node to the set of nodes and an empty list to the dictionary of edges with node key """
@@ -142,7 +142,7 @@ class Digraph(object):
         res = ''
         for k in self.edges:
             for d in self.edges[k]:
-                res = res + str(k) + '->' + str(d) + ' distance of ' + str(k.computeDist(d)) + '\n'
+                res = res + str(k) + '->' + str(d) + ' distance of ' + str(k.computeDistance(d)) + '\n'
         return res[:-1]
 
 
@@ -207,6 +207,6 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
 
         g.addEdge(Edge(depot, g.getRealDepots()[correspondingDepotIdx]))
 
-    g.distanceMatrix = [[node.computeDist(otherNode) for otherNode in g.getNodes()] for node in g.getNodes()]
+    g.distanceMatrix = [[node.computeDistance(otherNode) for otherNode in g.getNodes()] for node in g.getNodes()]
 
     return g

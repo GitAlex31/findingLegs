@@ -5,7 +5,7 @@ import time, pickle
 
 def main():
 
-    numberOfCustomers = 13
+    numberOfCustomers = 3
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -15,14 +15,15 @@ def main():
         raise ValueError("The network must have at least 1 customer and 2 depots.")
 
     #print(g)
-    #allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)
-    #allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
-    #print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
-    #print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
+
+    # allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)
+    # allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
+    # print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
+    # print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
 
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
-    generateInputFileWithLegs = False  # boolean used to decide if the input files are generated with the the legs enumeration or not
-    generateInputFileForVrpGencol = False  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
+    generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
+    generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     if generateInputFileWithLegs:

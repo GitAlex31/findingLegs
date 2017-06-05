@@ -54,15 +54,15 @@ class Window(Frame):
 
         # customers are represented by circles, depots by squares
         for customer in self.customers:
-            x = customer.getCoord()[0] / 2
-            y = customer.getCoord()[1] / 2
+            x = customer.getCoordinates()[0] / 2
+            y = customer.getCoordinates()[1] / 2
 
             size = 10
             canvas.create_oval(x, y, x + size, y + size)
 
         for depot in self.depots:
-            x = depot.getCoord()[0] / 2
-            y = depot.getCoord()[1] / 2
+            x = depot.getCoordinates()[0] / 2
+            y = depot.getCoordinates()[1] / 2
             size = 10
 
             if depot.getName() == '0':
@@ -74,8 +74,8 @@ class Window(Frame):
 
         for route in routes:
             for i in range(len(route)-1):
-                canvas.create_line(tuple(i / 2 + 5 for i in route[i].getCoord()),
-                                   tuple(i / 2 + 5 for i in route[i+1].getCoord()), arrow='last')
+                canvas.create_line(tuple(i / 2 + 5 for i in route[i].getCoordinates()),
+                                   tuple(i / 2 + 5 for i in route[i+1].getCoordinates()), arrow='last')
 
         canvas.pack(fill=BOTH, expand=1)
 

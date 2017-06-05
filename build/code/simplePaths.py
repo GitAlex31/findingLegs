@@ -18,7 +18,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
     for i in range(len(currentPath[:-1])):
         if i != 0:
             usedCapacity += currentPath[i].getServiceTime()
-        usedCapacity += float(currentPath[i].computeDist(currentPath[i+1])) / droneSpeed
+        usedCapacity += float(currentPath[i].computeDistance(currentPath[i + 1])) / droneSpeed
     # if the last node in currentPath is not a depot, we add its service time to the used capacity
     # consider changing the code if the depot have a non-negative service time
     if currentPath[-1].getServiceTime() != -1:
@@ -42,7 +42,7 @@ def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, 
             # if the node is not already visited and that the drone can reach to the end node after
             # and if the node is not a new depot different from the destination depot that is a function's argument
             if v not in currentPath \
-                    and usedCapacity + (float(node_s.computeDist(v)) / droneSpeed) + serviceTime <= droneAutonomy \
+                    and usedCapacity + (float(node_s.computeDistance(v)) / droneSpeed) + serviceTime <= droneAutonomy \
                     and not (v.getServiceTime() == -1 and v != node_t):
                 # recursion
                 exploreSimplePaths(g, v.getName(), node_t.getName(), currentPath, simplePaths, droneSpeed, droneAutonomy)
@@ -95,7 +95,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):  
     simplePaths = []
     customers = g.getCustomers()
 
-    if node_s.computeDist(node_t) / droneSpeed <= droneAutonomy:  # first we build the inter-depots routes if possible
+    if node_s.computeDistance(node_t) / droneSpeed <= droneAutonomy:  # first we build the inter-depots routes if possible
         simplePaths.append([node_s, node_t])  # without any customer
 
     for i, customer in enumerate(customers):  # we build legs with 1 customer only

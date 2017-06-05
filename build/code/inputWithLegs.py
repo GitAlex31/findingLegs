@@ -150,7 +150,7 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25,
         myFile.write("N0arr Destination 0 [0];\n")
 
     for depot in g.getRealDepots()[1:]:  # we exclude the source depot whose arc has already been written
-        time = int(depot.computeDist(g.getNode(0)) / droneSpeed * 60)  # similar to computeLength method of Path class
+        time = int(depot.computeDistance(g.getNode(0)) / droneSpeed * 60)  # similar to computeLength method of Path class
         if VrpGencolFormatting:
             myFile.write("N{0}arr Destination {1} as [{1}];\n".format(depot.getName(), time))
         else:
