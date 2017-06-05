@@ -139,7 +139,7 @@ def createVrpGENCOLFileArcSets(fileName):
     myFile = open(fileName, 'a')
     myFile.write("ArcSets={\n")
     myFile.write("as;\n")
-    myFile.write("\n};")
+    myFile.write("};\n\n")
 
 def createVrpGENCOLInputFileNetwork(fileName):
     myFile = open(fileName, 'a')
