@@ -85,17 +85,19 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
         return simplePaths
 
 
-def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):  # TODO : review function performance
+def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
     """Returns the list of least cost simple paths between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
     node_s = g.getNode(s)  # we get the node object from its name
     node_t = g.getNode(t)
 
+    droneAutonomy *= 60  # we do all of our computations in seconds to get the same results as without the legs
+
     simplePaths = []
     customers = g.getCustomers()
 
-    if node_s.computeDistance(node_t) / droneSpeed <= droneAutonomy:  # first we build the inter-depots routes if possible
+    if int((node_s.computeDistance(node_t) / droneSpeed) * 60) <= droneAutonomy:  # first we build the inter-depots routes if possible
         simplePaths.append([node_s, node_t])  # without any customer
 
     for i, customer in enumerate(customers):  # we build legs with 1 customer only

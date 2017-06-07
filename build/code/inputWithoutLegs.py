@@ -87,7 +87,7 @@ def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAut
                     myFile.write("N{0}dep N{1}arr {2} [{2} {2}];\n".format(depot.getName(), otherDepot.getName(), time))
 
     for depot in g.getRealDepots():  # writing rows for the charging at the different stations
-        chargingTime = 0  # in the first place we put a 0 charging time
+        chargingTime = 0  # in the first place we put a negligible charging time similar to a change of the batteries
         if VrpGencolFormatting:
             myFile.write("N{0}arr N{0}dep {1} as [{1} {2}];\n".format(depot.getName(), chargingTime, "-" + str(droneAutonomy)))
         else:

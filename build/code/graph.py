@@ -6,7 +6,8 @@ import math, random
 
 class Node(object):
     def __init__(self, name, x, y, serviceTime=0):
-        """A node has 4 attributes : its name, coordinates x and y, and a service time"""
+        """A node has 4 attributes : its name, coordinates x and y, and a service time
+        Service time is 0 by default and initialized in buildGraph function."""
         self.name = name
         self.x = x
         self.y = y
@@ -24,9 +25,11 @@ class Node(object):
         return math.sqrt(math.pow(self.x - other.x, 2) + math.pow(self.y - other.y, 2))
 
     def __str__(self):
+        """String representation of a Node"""
         return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")"
 
     def __lt__(self, other):
+        """Definition of Node sorting"""
         return int(self.getName()) < int(other.getName())
 
     def __ge__(self, other):
@@ -51,26 +54,31 @@ class Edge(object):
         return str(self.src) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
 
 class Path(object):
+
     def __init__(self, nodesList):
         """A path consist in an ordered list of nodes. The origin and destination nodes are not necessarily depots."""
         self.nodesList = nodesList
 
     def computeLength(self, speed):
-        """Returns the length of the path, without counting the service time of the origin nor destination nodes."""
+        """Returns the length of the path, without counting the service time of the origin or destination nodes.
+        Operations are performed in seconds in order to get the same results as the solution without leg generation."""
         length = 0
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
-                length += self.nodesList[i].getServiceTime()
-            length += float(self.nodesList[i].computeDistance(self.nodesList[i + 1])) / speed
-        return length
+                length += int(self.nodesList[i].getServiceTime() * 60)
+            length += int(float(self.nodesList[i].computeDistance(self.nodesList[i + 1])) * 60 / speed)
+        return int(length)
 
     def computeLengthWithDistanceMatrix(self, g, speed):
+        """Returns the length of the path, without counting the service time of the origin or destination nodes.
+        It uses a distance matrix, which is an attribute of the graph, that in turn accelerate the algorithm.
+        Operations are performed in seconds in order to get the same results as the solution without leg generation."""
         length = 0
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
-                length += self.nodesList[i].getServiceTime()
-            length += g.distanceMatrix[int(self.nodesList[i].getName())][int(self.nodesList[i+1].getName())] / speed  # supposed to be faster because computeDistance is less called
-        return length
+                length += int(self.nodesList[i].getServiceTime() * 60)
+            length += int((g.distanceMatrix[int(self.nodesList[i].getName())][int(self.nodesList[i+1].getName())] / speed) * 60)
+        return int(length)
 
 
 
@@ -149,7 +157,7 @@ class Digraph(object):
 def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):  # TODO : maxDistance should be an attribute of graph
     """Build graph g with user-defined parameter values and random positions for nodes.
     Trick used to allow for self-loops is the duplication of depots."""  # TODO : in fact the whole function should be in the class ?
-    random.seed(123)
+    random.seed(123)  # useful for debugging purposes
 
     g = Digraph()
 
