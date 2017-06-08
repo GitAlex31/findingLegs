@@ -191,8 +191,8 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSp
 def createVrpGENCOLFileArcSets(fileName):
     myFile = open(fileName, 'a')
     myFile.write("ArcSets={\n")
-    myFile.write("as;\n")
-    myFile.write("\n};")
+    myFile.write("as;")
+    myFile.write("\n};\n\n")
 
 def createVrpGENCOLInputFileNetwork(fileName):
     myFile = open(fileName, 'a')
