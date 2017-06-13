@@ -86,19 +86,32 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
 
 
 def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
-    """Returns the list of least cost simple paths between node named s and node named t in graph g.
+    """Returns the list of least cost simple paths of customers between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
     node_s = g.getNode(s)  # we get the node object from its name
     node_t = g.getNode(t)
 
+    depotsListForGraphExploration = g.getRealDepots()
+    depotsListForSelfLoops = g.getOtherDepots()
+    try:
+        associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(node_s)]  # real depot associated
+    except:
+        associatedDepot = None
+
     droneAutonomy *= 60  # we do all of our computations in seconds to get the same results as without the legs
 
     simplePaths = []
-    customers = g.getCustomers()
+    simplePathsLeg = []
+    identity = 0  # identity begins by 1 by incrementation
 
-    if int((node_s.computeDistance(node_t) / droneSpeed) * 60) <= droneAutonomy:  # first we build the inter-depots routes if possible
-        simplePaths.append([node_s, node_t])  # without any customer
+    customers = g.getCustomers()
+    # first we create the legs between the recharging stations, excluding legs for the same depot visiting no customers
+    if int((node_s.computeDistance(node_t) / droneSpeed) * 60) <= droneAutonomy:
+        if node_t != associatedDepot:
+            identity += 1
+            simplePaths.append([node_s, node_t])
+            simplePathsLeg.append(graph.Path([node_s, node_t], identity))
 
     for i, customer in enumerate(customers):  # we build legs with 1 customer only
         temporaryList = [node_s, customer, node_t]
@@ -108,6 +121,9 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
         if candidateRouteLength < droneAutonomy:
 
             simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
+            identity += 1
+            simplePathsLeg.append(graph.Path(temporaryList[:], identity))
+
 
             for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
 
@@ -126,6 +142,8 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                         leastCostLeg2 = [node_s] + list(perm2) + [node_t]
 
                 simplePaths.append(leastCostLeg2)
+                identity += 1
+                simplePathsLeg.append(graph.Path(leastCostLeg2, identity))
 
                 if not totalUnfeasibility2:
 
@@ -145,6 +163,8 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                 leastCostLeg3 = [node_s] + list(perm3) + [node_t]
 
                         simplePaths.append(leastCostLeg3)
+                        identity += 1
+                        simplePathsLeg.append(graph.Path(leastCostLeg3, identity))
 
                         if not totalUnfeasibility3:
 
@@ -165,8 +185,10 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                         leastCostLeg4 = [node_s] + list(perm4) + [node_t]
 
                                 simplePaths.append(leastCostLeg4)
+                                identity += 1
+                                simplePathsLeg.append(graph.Path(leastCostLeg4, identity))
 
-    return simplePaths
+    return simplePaths, simplePathsLeg
 
 
 def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
@@ -177,23 +199,25 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
     start_time = time.time()
 
     allSimplePaths = []
+    allSimplePathsLeg = []
 
     depotsListForGraphExploration = g.getRealDepots()
     depotsListForSelfLoops = g.getOtherDepots()
 
-    for depot in depotsListForGraphExploration:  # simple paths between different depots
+    for depot in depotsListForGraphExploration:  # generating legs with different start and ending depots
         for other in depotsListForGraphExploration:
             if depot != other:
                 if recursiveAlgorithm:
                     simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
                     #allSimplePaths.extend(simplePaths)
-                    allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                    allSimplePathsLeg.extend(filterSimplePaths(g, simplePaths, droneSpeed))
                 else:
-                    simplePaths = exploreSimplePathsNonRecursive(g, depot.getName(), other.getName(), droneSpeed,
+                    simplePaths, simplePathsLeg = exploreSimplePathsNonRecursive(g, depot.getName(), other.getName(), droneSpeed,
                                                      droneAutonomy)
                     allSimplePaths.extend(simplePaths)
+                    allSimplePathsLeg.extend(simplePathsLeg)
 
-    for depot in depotsListForSelfLoops:
+    for depot in depotsListForSelfLoops:  # generating legs beginning and ending at the same depot
 
         associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
 
@@ -202,9 +226,10 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
             #allSimplePaths.extend(simplePaths)
             allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
         else:
-            simplePaths = exploreSimplePathsNonRecursive(g, depot.getName(), associatedDepot.getName(), droneSpeed,
+            simplePaths, simplePathsLeg = exploreSimplePathsNonRecursive(g, depot.getName(), associatedDepot.getName(), droneSpeed,
                                              droneAutonomy)
             allSimplePaths.extend(simplePaths)
+            allSimplePathsLeg.extend(simplePathsLeg)
 
     if printStatistics:  # useful statistics about the built graph
         numberOfCustomers = len(g.getCustomers())
@@ -237,7 +262,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
     print("\n Time used for generating the legs : --- {} seconds --- with {} algorithm"
           .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
 
-    return allSimplePaths
+    return allSimplePaths, allSimplePathsLeg
 
 def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=False):
     """Returns time windows for depots according to different options : 

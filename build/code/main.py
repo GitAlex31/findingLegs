@@ -5,7 +5,7 @@ import time, pickle
 
 def main():
 
-    numberOfCustomers = 3
+    numberOfCustomers = 2
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -16,10 +16,12 @@ def main():
 
     #print(g)
 
-    # allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)
+    # allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)[0]
+    # allSimplePathsNonRecursiveLeg = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)[1]
     # allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
     # print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
     # print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
+    # print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
 
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
     generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
@@ -32,7 +34,7 @@ def main():
         else:
             fileName = "input{}_{}_{}.txt".format(numberOfCustomers, numberOfDepots, "tight5")
 
-        # if uncommented, returns an informative text file on the generated legs (can be long)
+        # if uncommented, returns an informative text file on the generated legs (can take time)
         #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
 
         if generateInputFileForVrpGencol:

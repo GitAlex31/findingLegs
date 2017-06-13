@@ -55,9 +55,11 @@ class Edge(object):
 
 class Path(object):
 
-    def __init__(self, nodesList):
-        """A path consist in an ordered list of nodes. The origin and destination nodes are not necessarily depots."""
+    def __init__(self, nodesList, identity=0):
+        """A path consist in an ordered list of nodes. The origin and destination nodes are not necessarily depots.
+        An id is provided to each leg, which is 0 by default."""
         self.nodesList = nodesList
+        self.identity = identity
 
     def computeLength(self, speed):
         """Returns the length of the path, without counting the service time of the origin or destination nodes.

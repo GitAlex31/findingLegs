@@ -9,7 +9,8 @@ def createSummaryFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAl
     list of its visited customers or sites.
     Beware : the returned text is only informative but not used by GENCOL or other program in any way."""
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+
     fileName = "../output/" + fileName  # builds the input file into the right directory
     myFile = open(fileName, "w")
     myFile.write("Number of customers: {}   Number of Depots: {}    Drone Autonomy: {} min  Drone Speed:{} m/min"
@@ -53,9 +54,13 @@ def createGENCOLInputFile(fileName):
     myFile = open(fileName, 'w')
     pass
 
-def createGENCOLInputFileResources(fileName):
+def createGENCOLInputFileResources(fileName, antiSymmetryArcs=False):
     myFile = open(fileName, 'a')
-    myFile.write("Resources={\nTime Strong;\n};\n\n")
+    if not antiSymmetryArcs:
+        myFile.write("Resources={\nTime Strong;\n};\n\n")
+    if antiSymmetryArcs:
+        myFile.write("Resources={\nTime Strong;\n")
+        myFile.write("antiSymmetry Strong;\n};\n\n")
     pass
 
 
@@ -85,29 +90,60 @@ def createGENCOLInputFileColumns(fileName, fixedCost):
 def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     myFile = open(fileName, 'a')
     myFile.write("Nodes={\n")
-
-    numberOfCustomers = len(g.getCustomers())
-
-    #myFile.write("N{}dep [0 0];\n".format(str(numberOfCustomers)))
     myFile.write("Source [0 0];\n")
 
     for i, depot in enumerate(g.getRealDepots()):
         myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
         myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
 
-    #myFile.write("N{}arr [0 1440];\n".format(str(numberOfCustomers + 1)))
     myFile.write("Destination [0 86400];\n")
-
     myFile.write("};\n\n")
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25,
-                              recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False):
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False,
+                              printStatistics=False, VrpGencolFormatting=False, antiSymmetry=False, timeIntervals=None):
 
-    simplePathsList = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+
+    antiSymmetryNodeIdx = 0
 
     myFile = open(fileName, 'a')
+
+    if antiSymmetry:  # we decide whether or not we write the nodes for symmetry breaking
+        myFile.write("Nodes={\n")
+        myFile.write("Source [0 0];\n")
+
+        for i, depot in enumerate(g.getRealDepots()):  # first we create the "normal" nodes
+            myFile.write(
+                "N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
+            myFile.write(
+                "N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
+
+        myFile.write("Destination [0 86400];\n")
+
+        for i, leg in enumerate(simplePathsListLeg):  # then the nodes used to break the symmetry
+            if leg.nodesList[0] in g.getOtherDepots():
+                associatedDepot = g.getRealDepots()[g.getOtherDepots().index(leg.nodesList[0])]
+                lowerTW_0 = timeIntervals[g.getRealDepots().index(associatedDepot)][0]
+                upperTW_0 = timeIntervals[g.getRealDepots().index(associatedDepot)][1]
+            else:
+                lowerTW_0 = timeIntervals[g.getRealDepots().index(leg.nodesList[0])][0]
+                upperTW_0 = timeIntervals[g.getRealDepots().index(leg.nodesList[0])][1]
+
+            if leg.nodesList[-1] in g.getOtherDepots():
+                associatedDepot = g.getRealDepots()[g.getOtherDepots().index(leg.nodesList[-1])]
+                lowerTW_m1 = timeIntervals[g.getRealDepots().index(associatedDepot)][0]
+                upperTW_m1 = timeIntervals[g.getRealDepots().index(associatedDepot)][1]
+            else:
+                lowerTW_m1 = timeIntervals[g.getRealDepots().index(leg.nodesList[-1])][0]
+                upperTW_m1 = timeIntervals[g.getRealDepots().index(leg.nodesList[-1])][1]
+
+            myFile.write("A{0} [{1} {2}] [{3} {3}];\n"
+                         .format(str(i+1), min(lowerTW_0, lowerTW_m1), max(upperTW_0, upperTW_m1),  str(leg.identity)))
+
+        myFile.write("};\n\n")
+
     myFile.write("Arcs={\n")
 
     for leg in simplePathsList:
@@ -130,12 +166,22 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25,
         if len(leg) > 2:
             visitedNodesStr = "D" + " D".join([node.getName() for node in leg[1:-1]])
 
-        if not ((dep == dest) and visitedNodesStr == ""):  # we exclude the self-loops visiting no clients TODO: we can do it while generating the legs
-            if VrpGencolFormatting:
+        if VrpGencolFormatting:
+            if not antiSymmetry:
                 myFile.write("N{} N{} {} as [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time,
                                                             visitedNodesStr))
             else:
-                myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
+                antiSymmetryNodeIdx += 1
+                if dep.getName() == dest.getName():
+                    myFile.write("N{} A{} {} as [{} 0] {};\n".format(dep.getName() + "dep", antiSymmetryNodeIdx, time, time,
+                                                          visitedNodesStr))
+                else:
+                    myFile.write(
+                        "N{} A{} {} as [{} -9999] {};\n".format(dep.getName() + "dep", antiSymmetryNodeIdx, time, time,
+                                                            visitedNodesStr))
+                myFile.write("A{} N{} 0 as [0 0];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
+        else:
+            myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
 
     # we then add the arcs needed for the modelling of the departure and come-back to the central depot
     if VrpGencolFormatting:
@@ -174,7 +220,7 @@ def createGENCOLInputFileNetwork(fileName):
 
 
 def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
-                                  recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False):
+                                  recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False, antiSymmetryArcs=False):
     """Creates the complete GENCOL input file used by GENCOL to solve the VRP-TW"""
     fileName = "../output/" + fileName  # builds the GENCOL input file into the right directory
     createGENCOLInputFile(fileName)
@@ -183,7 +229,8 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSp
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics, VrpGencolFormatting)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics,
+                              VrpGencolFormatting, antiSymmetryArcs)
     createGENCOLInputFileNetwork(fileName)
     pass
 
@@ -199,19 +246,22 @@ def createVrpGENCOLInputFileNetwork(fileName):
     myFile.write("Networks={\n")
     myFile.write("Net Source (Destination) (as);")
     myFile.write("\n};")
+    myFile.close()
 
 
 def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
-                                     recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=True):
+                                     recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=True, antiSymmetryArcs=True):
     """Creates the VrpGENCOL input file used by VrpGencol to solve the VRP-TW"""
     fileName = "../output/" + fileName  # builds the VrpGencol input file into the right directory
     createGENCOLInputFile(fileName)
-    createGENCOLInputFileResources(fileName)
+    createGENCOLInputFileResources(fileName, antiSymmetryArcs)
     createGENCOLInputFileRows(fileName, g)
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
-    createGENCOLInputFileNodes(fileName, g, timeIntervals)
+    if not antiSymmetryArcs:
+        createGENCOLInputFileNodes(fileName, g, timeIntervals)
     createVrpGENCOLFileArcSets(fileName)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics, VrpGencolFormatting)
+    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics,
+                              VrpGencolFormatting, antiSymmetryArcs, timeIntervals)
     createVrpGENCOLInputFileNetwork(fileName)
     pass
