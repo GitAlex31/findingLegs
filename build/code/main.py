@@ -26,26 +26,30 @@ def main():
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
     generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
     generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
+    antiSymmetry = False  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     if generateInputFileWithLegs:
         if generateInputFileForVrpGencol:
-            fileName = "inputVrp{}_{}_{}.txt".format(numberOfCustomers, numberOfDepots, "tight5")
+            if not antiSymmetry:
+                fileName = "problemVrp{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight15")
+            else:
+                fileName = "problemVrp{}_{}_{}_as.out".format(numberOfCustomers, numberOfDepots, "tight15")
         else:
-            fileName = "input{}_{}_{}.txt".format(numberOfCustomers, numberOfDepots, "tight5")
+            fileName = "problem{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight15")
 
         # if uncommented, returns an informative text file on the generated legs (can take time)
         #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
 
         if generateInputFileForVrpGencol:
-            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
+            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True, antiSymmetryArcs=antiSymmetry)
         else:
             inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
     else:
         if generateInputFileForVrpGencol:
-            fileName = "inputVrp{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
+            fileName = "problemVrp{}_{}_{}_p.our".format(numberOfCustomers, numberOfDepots, "tight15")
         else:
-            fileName = "input{}_{}_{}_p.txt".format(numberOfCustomers, numberOfDepots, "tight5")
+            fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
 
         if generateInputFileForVrpGencol:
             inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=600, droneAutonomy=25)

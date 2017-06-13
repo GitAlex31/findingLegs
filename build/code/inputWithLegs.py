@@ -112,15 +112,15 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
 
     if antiSymmetry:  # we decide whether or not we write the nodes for symmetry breaking
         myFile.write("Nodes={\n")
-        myFile.write("Source [0 0];\n")
+        myFile.write("Source [0 0] [0 0];\n")
 
         for i, depot in enumerate(g.getRealDepots()):  # first we create the "normal" nodes
             myFile.write(
-                "N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
+                "N{} [{} {}] [0 0]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
             myFile.write(
-                "N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
+                "N{} [{} {}] [0 0]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
 
-        myFile.write("Destination [0 86400];\n")
+        myFile.write("Destination [0 86400] [0 0];\n")
 
         for i, leg in enumerate(simplePathsListLeg):  # then the nodes used to break the symmetry
             if leg.nodesList[0] in g.getOtherDepots():
@@ -186,9 +186,13 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
     # we then add the arcs needed for the modelling of the departure and come-back to the central depot
     if VrpGencolFormatting:
         # first we do that for the Source
-        myFile.write("Source N0dep 0 as [0] (RowVeh -1);\n")
-        # then for the Destination
-        myFile.write("N0arr Destination 0 as [0];\n")
+        if not antiSymmetry:
+            myFile.write("Source N0dep 0 as [0] (RowVeh -1);\n")
+            # then for the Destination
+            myFile.write("N0arr Destination 0 as [0];\n")
+        else:
+            myFile.write("Source N0dep 0 as [0 0] (RowVeh -1);\n")
+            myFile.write("N0arr Destination 0 as [0 0];\n")
     else:
         myFile.write("Source N0dep 0 [0] (RowVeh -1);\n")
         myFile.write("N0arr Destination 0 [0];\n")
@@ -196,14 +200,20 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
     for depot in g.getRealDepots()[1:]:  # we exclude the source depot whose arc has already been written
         time = int(depot.computeDistance(g.getNode(0)) / droneSpeed * 60)  # computation of the time in seconds
         if VrpGencolFormatting:
-            myFile.write("N{0}arr Destination {1} as [{1}];\n".format(depot.getName(), time))
+            if not antiSymmetry:
+                myFile.write("N{0}arr Destination {1} as [{1}];\n".format(depot.getName(), time))
+            else:
+                myFile.write("N{0}arr Destination {1} as [{1} 0];\n".format(depot.getName(), time))
         else:
             myFile.write("N{0}arr Destination {1} [{1}];\n".format(depot.getName(), time))
 
     # finally we add the arc corresponding to the battery charging that we initialize to zero for the moment
     for depot in g.getRealDepots():
         if VrpGencolFormatting:
-            myFile.write("N{0}arr N{0}dep 0 as [0];\n".format(depot.getName()))
+            if not antiSymmetry:
+                myFile.write("N{0}arr N{0}dep 0 as [0];\n".format(depot.getName()))
+            else:
+                myFile.write("N{0}arr N{0}dep 0 as [0 0];\n".format(depot.getName()))
         else:
             myFile.write("N{0}arr N{0}dep 0 [0];\n".format(depot.getName()))
 
