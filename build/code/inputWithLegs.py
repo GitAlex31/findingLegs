@@ -116,11 +116,11 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
 
         for i, depot in enumerate(g.getRealDepots()):  # first we create the "normal" nodes
             myFile.write(
-                "N{} [{} {}] [0 0]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
+                "N{} [{} {}] [0 9999]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
             myFile.write(
-                "N{} [{} {}] [0 0]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
+                "N{} [{} {}] [0 9999]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
 
-        myFile.write("Destination [0 86400] [0 0];\n")
+        myFile.write("Destination [0 86400] [0 9999];\n")
 
         for i, leg in enumerate(simplePathsListLeg):  # then the nodes used to break the symmetry
             if leg.nodesList[0] in g.getOtherDepots():
