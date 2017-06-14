@@ -238,7 +238,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
         print("Number of customers : {}".format(numberOfCustomers))
         print("Number of Depots : {}".format(numberOfDepots))
         print("Number of paths : ", len(allSimplePaths))
-        min_nbr = min([len(path) - 2 for path in allSimplePaths])  # always 0 for because of self-loops and depot-depot simple paths
+        min_nbr = min([len(path) - 2 for path in allSimplePaths])  # always 0 for because of same depots legs
         max_nbr = max([len(path) - 2 for path in allSimplePaths])
         print("Min number of customers between two depots : {}".format(min_nbr))
         print("Max number of customers between two depots : {}".format(max_nbr))

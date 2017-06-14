@@ -131,16 +131,12 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
                 lowerTW_0 = timeIntervals[g.getRealDepots().index(leg.nodesList[0])][0]
                 upperTW_0 = timeIntervals[g.getRealDepots().index(leg.nodesList[0])][1]
 
-            if leg.nodesList[-1] in g.getOtherDepots():
-                associatedDepot = g.getRealDepots()[g.getOtherDepots().index(leg.nodesList[-1])]
-                lowerTW_m1 = timeIntervals[g.getRealDepots().index(associatedDepot)][0]
-                upperTW_m1 = timeIntervals[g.getRealDepots().index(associatedDepot)][1]
-            else:
-                lowerTW_m1 = timeIntervals[g.getRealDepots().index(leg.nodesList[-1])][0]
-                upperTW_m1 = timeIntervals[g.getRealDepots().index(leg.nodesList[-1])][1]
+            lowerTW_m1 = timeIntervals[g.getRealDepots().index(leg.nodesList[-1])][0]
+            upperTW_m1 = timeIntervals[g.getRealDepots().index(leg.nodesList[-1])][1]
 
-            myFile.write("A{0} [{1} {2}] [{3} {3}];\n"
-                         .format(str(i+1), min(lowerTW_0, lowerTW_m1), max(upperTW_0, upperTW_m1),  str(leg.identity)))
+            if leg.nodesList[0] in g.getOtherDepots():  # symmetry breaking is only useful for legs with the same beginning and ending nodes
+                myFile.write("A{0} [{1} {2}] [{3} {3}];\n"
+                             .format(str(i+1), min(lowerTW_0, lowerTW_m1), max(upperTW_0, upperTW_m1),  str(leg.identity)))
 
         myFile.write("};\n\n")
 
@@ -175,11 +171,13 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
                 if dep.getName() == dest.getName():
                     myFile.write("N{} A{} {} as [{} 0] {};\n".format(dep.getName() + "dep", antiSymmetryNodeIdx, time, time,
                                                           visitedNodesStr))
+                    myFile.write("A{} N{} 0 as [0 0];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
                 else:
                     myFile.write(
-                        "N{} A{} {} as [{} -9999] {};\n".format(dep.getName() + "dep", antiSymmetryNodeIdx, time, time,
+                        "N{} N{} {} as [{} -9999] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time,
                                                             visitedNodesStr))
-                myFile.write("A{} N{} 0 as [0 0];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
+                    #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
+                #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
         else:
             myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
 
