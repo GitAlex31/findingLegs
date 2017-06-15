@@ -173,9 +173,12 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
                                                           visitedNodesStr))
                     myFile.write("A{} N{} 0 as [0 0];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
                 else:
-                    myFile.write(
-                        "N{} N{} {} as [{} -9999] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time,
-                                                            visitedNodesStr))
+                    myFile.write("N{} N{} {} as [{} -9999] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time,
+                                                             visitedNodesStr))
+                        #myFile.write("N{} A{} {} as [{} 0] {};\n".format(dep.getName() + "dep", antiSymmetryNodeIdx, time, time,
+                                                            #visitedNodesStr))
+                        #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
+
                     #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
                 #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
         else:
