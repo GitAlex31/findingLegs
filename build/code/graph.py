@@ -2,16 +2,17 @@
 
 import math, random
 
-# graph.py contains the classes implementation : Node, Edge, Path and Digraph classes
+# graph.py contains the classes implementation : Node, Arc, Path and Digraph classes
 
 class Node(object):
-    def __init__(self, name, x, y, serviceTime=0):
+    def __init__(self, name, x, y, serviceTime=0, timeWindow = None):
         """A node has 4 attributes : its name, coordinates x and y, and a service time
         Service time is 0 by default and initialized in buildGraph function."""
         self.name = name
         self.x = x
         self.y = y
         self.serviceTime = serviceTime
+        self.timeWindow = timeWindow
 
     def getName(self):
         return self.name
@@ -19,6 +20,8 @@ class Node(object):
         return self.serviceTime
     def getCoordinates(self):
         return (self.x, self.y)
+    def getTimeWindow(self):
+        return self.timeWindow
 
     def computeDistance(self, other):
         """Returns the euclidian distance between two node"""
@@ -36,22 +39,24 @@ class Node(object):
         return int(self.getName()) >= int(other.getName())
 
 
-class Edge(object):
-    def __init__(self, src, dest):
-        """An edge has two attributes : its source and destination nodes"""
-        self.src = src
+class Arc(object):
+    def __init__(self, dep, dest):
+        """An arc has two attributes : its departure and destination nodes"""
+        self.dep = dep
         self.dest = dest
-        self.dist = Node.computeDistance(self.src, self.dest)  # the distance is computed internally
+        self.dist = Node.computeDistance(self.dep, self.dest)  # the distance is computed internally
 
     def getSource(self):
-        return self.src
+        return self.dep
     def getDestination(self):
         return self.dest
     def getDist(self):
         return self.dist
 
     def __str__(self):
-        return str(self.src) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
+        """String representation of an arc"""
+        return str(self.dep) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
+
 
 class Path(object):
 
@@ -83,7 +88,6 @@ class Path(object):
         return int(length)
 
 
-
 class Digraph(object):
 
     def __init__(self):
@@ -101,12 +105,12 @@ class Digraph(object):
             self.edges[node] = []
 
     def addEdge(self, edge):
-        """Adds edge of source src and destination dest in the edges dictionary in the form of an adjacency list"""
-        src = edge.getSource()
+        """Adds edge of source dep and destination dest in the edges dictionary in the form of an adjacency list"""
+        dep = edge.getSource()
         dest = edge.getDestination()
-        if not (src in self.nodes and dest in self.nodes):
+        if not (dep in self.nodes and dest in self.nodes):
             raise ValueError('Node not in graph')  # verify if both source and dest are in the node set
-        self.edges[src].append(dest)
+        self.edges[dep].append(dest)
 
     def childrenOf(self, node):
         """Returns the list of the children of node"""
@@ -198,24 +202,24 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
     for customer in customers:  # first, we make a directed clique with the customers set
         for other in customers:
             if customer != other:
-                g.addEdge(Edge(customer, other))
+                g.addEdge(Arc(customer, other))
 
     for depot in depotsListForGraphExploration:  # then we add the edges for the graph exploration
         for customer in customers:
-            g.addEdge(Edge(depot, customer))
-            g.addEdge(Edge(customer, depot))
+            g.addEdge(Arc(depot, customer))
+            g.addEdge(Arc(customer, depot))
         for other in depotsListForGraphExploration:
             if depot != other:
-                g.addEdge(Edge(depot, other))
+                g.addEdge(Arc(depot, other))
 
     for depot in depotsListForSelfLoops:  # finally we add the edges to allow for self circuits
         for customer in customers:
-            g.addEdge(Edge(depot, customer))
+            g.addEdge(Arc(depot, customer))
 
         # index corresponding to the associated depot for graph exploration
         correspondingDepotIdx = g.getOtherDepots().index(depot)
 
-        g.addEdge(Edge(depot, g.getRealDepots()[correspondingDepotIdx]))
+        g.addEdge(Arc(depot, g.getRealDepots()[correspondingDepotIdx]))
 
     g.distanceMatrix = [[node.computeDistance(otherNode) for otherNode in g.getNodes()] for node in g.getNodes()]
 
