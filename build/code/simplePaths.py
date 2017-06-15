@@ -124,7 +124,6 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
             identity += 1
             simplePathsLeg.append(graph.Path(temporaryList[:], identity))
 
-
             for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
 
                 temporaryList2 = [customer, customer2]
@@ -204,9 +203,10 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
     depotsListForGraphExploration = g.getRealDepots()
     depotsListForSelfLoops = g.getOtherDepots()
 
-    for depot in depotsListForGraphExploration:  # generating legs with different start and ending depots
-        for other in depotsListForGraphExploration:
-            if depot != other:
+    for i, depot in enumerate(depotsListForGraphExploration):  # generating legs with different start and ending depots
+        for j, other in enumerate(depotsListForGraphExploration):
+            #if depot != other:
+            if j > i:
                 if recursiveAlgorithm:
                     simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
                     #allSimplePaths.extend(simplePaths)
@@ -216,6 +216,20 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
                                                      droneAutonomy)
                     allSimplePaths.extend(simplePaths)
                     allSimplePathsLeg.extend(simplePathsLeg)
+
+                    simplePathsReverse = []
+                    simplePathsReverseLeg = []
+                    for simplePath in simplePaths:
+                        #print(simplePath)
+                        reverseSimplePath = list(reversed(simplePath))
+                        reverseSimplePathLeg = graph.Path(reverseSimplePath)
+                        simplePathsReverse.append(reverseSimplePath)
+                        simplePathsReverseLeg.append(reverseSimplePathLeg)
+
+                    #simplePathsReverse, simplePathsReverseLeg = [list(reversed(simplePath)) for simplePath in simplePaths]
+                    #simplePathsReverseLeg = [graph.Path(simplePathReverse) for simplePathReverse in simplePathsReverse]
+                    allSimplePaths.extend(simplePathsReverse)
+                    allSimplePathsLeg.extend(simplePathsReverseLeg)
 
     for depot in depotsListForSelfLoops:  # generating legs beginning and ending at the same depot
 

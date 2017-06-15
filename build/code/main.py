@@ -5,7 +5,7 @@ import time, pickle
 
 def main():
 
-    numberOfCustomers = 2
+    numberOfCustomers = 30
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     if numberOfCustomers >= 1 and numberOfDepots >= 2:
@@ -47,7 +47,7 @@ def main():
             inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
     else:
         if generateInputFileForVrpGencol:
-            fileName = "problemVrp{}_{}_{}_p.our".format(numberOfCustomers, numberOfDepots, "tight15")
+            fileName = "problemVrp{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
         else:
             fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
 
