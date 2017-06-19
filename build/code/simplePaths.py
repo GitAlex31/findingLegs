@@ -124,6 +124,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
             identity += 1
             simplePathsLeg.append(graph.Path(temporaryList[:], identity))
 
+
             for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
 
                 temporaryList2 = [customer, customer2]
@@ -191,7 +192,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
 
 
 def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=False):
-    """Returns the list of all simple paths between depots in graph g, 
+    """Returns the list of all simple paths between depots in graph g,
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     printStatistics option True displays some statistics"""
 
@@ -203,10 +204,9 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
     depotsListForGraphExploration = g.getRealDepots()
     depotsListForSelfLoops = g.getOtherDepots()
 
-    for i, depot in enumerate(depotsListForGraphExploration):  # generating legs with different start and ending depots
-        for j, other in enumerate(depotsListForGraphExploration):
-            #if depot != other:
-            if j > i:
+    for depot in depotsListForGraphExploration:  # generating legs with different start and ending depots
+        for other in depotsListForGraphExploration:
+            if depot != other:
                 if recursiveAlgorithm:
                     simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
                     #allSimplePaths.extend(simplePaths)
@@ -216,20 +216,6 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
                                                      droneAutonomy)
                     allSimplePaths.extend(simplePaths)
                     allSimplePathsLeg.extend(simplePathsLeg)
-
-                    simplePathsReverse = []
-                    simplePathsReverseLeg = []
-                    for simplePath in simplePaths:
-                        #print(simplePath)
-                        reverseSimplePath = list(reversed(simplePath))
-                        reverseSimplePathLeg = graph.Path(reverseSimplePath)
-                        simplePathsReverse.append(reverseSimplePath)
-                        simplePathsReverseLeg.append(reverseSimplePathLeg)
-
-                    #simplePathsReverse, simplePathsReverseLeg = [list(reversed(simplePath)) for simplePath in simplePaths]
-                    #simplePathsReverseLeg = [graph.Path(simplePathReverse) for simplePathReverse in simplePathsReverse]
-                    allSimplePaths.extend(simplePathsReverse)
-                    allSimplePathsLeg.extend(simplePathsReverseLeg)
 
     for depot in depotsListForSelfLoops:  # generating legs beginning and ending at the same depot
 
@@ -279,7 +265,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
     return allSimplePaths, allSimplePathsLeg
 
 def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=False):
-    """Returns time windows for depots according to different options : 
+    """Returns time windows for depots according to different options :
     separetedTW indicates time-windows form an equal partition of the whole day.
     randomTW provides randomly chosen time windows during the whole day."""
     timeWindows = []

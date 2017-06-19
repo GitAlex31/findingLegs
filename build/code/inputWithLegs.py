@@ -93,8 +93,8 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     myFile.write("Source [0 0];\n")
 
     for i, depot in enumerate(g.getRealDepots()):
-        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
-        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
+        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))#, str(depot.getName())))
+        myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))#, str(depot.getName())))
 
     myFile.write("Destination [0 86400];\n")
     myFile.write("};\n\n")
@@ -175,12 +175,6 @@ def createGENCOLInputFileNodesAndArcs(fileName, g, droneSpeed=600, droneAutonomy
                 else:
                     myFile.write("N{} N{} {} as [{} -9999] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time,
                                                              visitedNodesStr))
-                        #myFile.write("N{} A{} {} as [{} 0] {};\n".format(dep.getName() + "dep", antiSymmetryNodeIdx, time, time,
-                                                            #visitedNodesStr))
-                        #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
-
-                    #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
-                #myFile.write("A{} N{} 0 as [0 -9999];\n".format(antiSymmetryNodeIdx, dest.getName() + "arr"))
         else:
             myFile.write("N{} N{} {} [{}] {};\n".format(dep.getName() + "dep", dest.getName() + "arr", time, time, visitedNodesStr))
 

@@ -2,16 +2,17 @@
 
 import math, random
 
-# graph.py contains the classes implementation : Node, Edge, Path and Digraph classes
+# graph.py contains the classes implementation : Node, Arc, Path and Digraph classes
 
 class Node(object):
-    def __init__(self, name, x, y, serviceTime=0):
+    def __init__(self, name, x, y, serviceTime=0, timeWindow = (0, 86400)):
         """A node has 4 attributes : its name, coordinates x and y, and a service time
         Service time is 0 by default and initialized in buildGraph function."""
         self.name = name
         self.x = x
         self.y = y
         self.serviceTime = serviceTime
+        self.timeWindow = timeWindow
 
     def getName(self):
         return self.name
@@ -19,6 +20,8 @@ class Node(object):
         return self.serviceTime
     def getCoordinates(self):
         return (self.x, self.y)
+    def getTimeWindow(self):
+        return self.timeWindow
 
     def computeDistance(self, other):
         """Returns the euclidian distance between two node"""
@@ -26,7 +29,8 @@ class Node(object):
 
     def __str__(self):
         """String representation of a Node"""
-        return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")"
+        return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")" \
+               + " and time window [" + str(self.getTimeWindow()[0]) + "," + str(self.getTimeWindow()[1]) + "]"
 
     def __lt__(self, other):
         """Definition of Node sorting"""
@@ -36,22 +40,24 @@ class Node(object):
         return int(self.getName()) >= int(other.getName())
 
 
-class Edge(object):
-    def __init__(self, src, dest):
-        """An edge has two attributes : its source and destination nodes"""
-        self.src = src
+class Arc(object):
+    def __init__(self, dep, dest):
+        """An arc has two attributes : its departure and destination nodes"""
+        self.dep = dep
         self.dest = dest
-        self.dist = Node.computeDistance(self.src, self.dest)  # the distance is computed internally
+        self.dist = Node.computeDistance(self.dep, self.dest)  # the distance is computed internally
 
     def getSource(self):
-        return self.src
+        return self.dep
     def getDestination(self):
         return self.dest
     def getDist(self):
         return self.dist
 
     def __str__(self):
-        return str(self.src) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
+        """String representation of an arc"""
+        return str(self.dep) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
+
 
 class Path(object):
 
@@ -83,7 +89,6 @@ class Path(object):
         return int(length)
 
 
-
 class Digraph(object):
 
     def __init__(self):
@@ -101,12 +106,12 @@ class Digraph(object):
             self.edges[node] = []
 
     def addEdge(self, edge):
-        """Adds edge of source src and destination dest in the edges dictionary in the form of an adjacency list"""
-        src = edge.getSource()
+        """Adds edge of source dep and destination dest in the edges dictionary in the form of an adjacency list"""
+        dep = edge.getSource()
         dest = edge.getDestination()
-        if not (src in self.nodes and dest in self.nodes):
+        if not (dep in self.nodes and dest in self.nodes):
             raise ValueError('Node not in graph')  # verify if both source and dest are in the node set
-        self.edges[src].append(dest)
+        self.edges[dep].append(dest)
 
     def childrenOf(self, node):
         """Returns the list of the children of node"""
@@ -156,9 +161,9 @@ class Digraph(object):
         return res[:-1]
 
 
-def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):  # TODO : maxDistance should be an attribute of graph
-    """Build graph g with user-defined parameter values and random positions for nodes.
-    Trick used to allow for self-loops is the duplication of depots."""  # TODO : in fact the whole function should be in the class ?
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, explorationTime=5):  # TODO : maxDistance should be an attribute of graph ?
+    """Builds graph g with user-defined parameter values and random positions for nodes : customers and depots.
+    We create dummy vertices to allow for self-loops is the duplication of depots."""
     random.seed(123)  # useful for debugging purposes
 
     g = Digraph()
@@ -171,20 +176,21 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
         customers.append(Node(name, x, y, explorationTime))
 
     depots = []
-
     # first we add the central depot named "0"
     # and depot named "numberOfCustomers + 1" its corresponding depot for self-loops paths
+    timeWindowsIdx = 0
     x = random.random() * maxDistance
     y = random.random() * maxDistance
     depots.append(Node(str(0), x, y, -1))
-    depots.append(Node(str(numberOfCustomers + 1), x, y, -1))
+    depots.append(Node(str(numberOfCustomers + 1), x, y, -1, timeWindows[timeWindowsIdx]))
 
     name = numberOfCustomers + 2  # names of the real depots other than the central depot
     for i in range(numberOfCustomers+2, numberOfCustomers + numberOfDepots+1):
+        timeWindowsIdx += 1
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
-        depots.append(Node(str(name), x, y, -1))  # the depot has no exploration time : so -1 by default
-        depots.append(Node(str(name+1), x, y, -1))  # we duplicate each depot
+        depots.append(Node(str(name), x, y, -1, timeWindows[timeWindowsIdx]))  # -1 indicates no service time for the depot
+        depots.append(Node(str(name+1), x, y, -1, timeWindows[timeWindowsIdx]))  # we duplicate each depot
         name += 2
 
     # generation of a graph allowing the exploration of the complete graph and also the self circuits
@@ -198,24 +204,24 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
     for customer in customers:  # first, we make a directed clique with the customers set
         for other in customers:
             if customer != other:
-                g.addEdge(Edge(customer, other))
+                g.addEdge(Arc(customer, other))
 
     for depot in depotsListForGraphExploration:  # then we add the edges for the graph exploration
         for customer in customers:
-            g.addEdge(Edge(depot, customer))
-            g.addEdge(Edge(customer, depot))
+            g.addEdge(Arc(depot, customer))
+            g.addEdge(Arc(customer, depot))
         for other in depotsListForGraphExploration:
             if depot != other:
-                g.addEdge(Edge(depot, other))
+                g.addEdge(Arc(depot, other))
 
     for depot in depotsListForSelfLoops:  # finally we add the edges to allow for self circuits
         for customer in customers:
-            g.addEdge(Edge(depot, customer))
+            g.addEdge(Arc(depot, customer))
 
         # index corresponding to the associated depot for graph exploration
         correspondingDepotIdx = g.getOtherDepots().index(depot)
 
-        g.addEdge(Edge(depot, g.getRealDepots()[correspondingDepotIdx]))
+        g.addEdge(Arc(depot, g.getRealDepots()[correspondingDepotIdx]))
 
     g.distanceMatrix = [[node.computeDistance(otherNode) for otherNode in g.getNodes()] for node in g.getNodes()]
 
