@@ -5,7 +5,7 @@ import math, random
 # graph.py contains the classes implementation : Node, Arc, Path and Digraph classes
 
 class Node(object):
-    def __init__(self, name, x, y, serviceTime=0, timeWindow = None):
+    def __init__(self, name, x, y, serviceTime=0, timeWindow = (0, 86400)):
         """A node has 4 attributes : its name, coordinates x and y, and a service time
         Service time is 0 by default and initialized in buildGraph function."""
         self.name = name
@@ -29,7 +29,8 @@ class Node(object):
 
     def __str__(self):
         """String representation of a Node"""
-        return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")"
+        return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")" \
+               + " and time window [" + str(self.getTimeWindow()[0]) + "," + str(self.getTimeWindow()[1]) + "]"
 
     def __lt__(self, other):
         """Definition of Node sorting"""
@@ -160,9 +161,9 @@ class Digraph(object):
         return res[:-1]
 
 
-def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5):  # TODO : maxDistance should be an attribute of graph
-    """Build graph g with user-defined parameter values and random positions for nodes.
-    Trick used to allow for self-loops is the duplication of depots."""  # TODO : in fact the whole function should be in the class ?
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, explorationTime=5):  # TODO : maxDistance should be an attribute of graph ?
+    """Builds graph g with user-defined parameter values and random positions for nodes : customers and depots.
+    We create dummy vertices to allow for self-loops is the duplication of depots."""
     random.seed(123)  # useful for debugging purposes
 
     g = Digraph()
@@ -175,20 +176,21 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, explorationTime=5
         customers.append(Node(name, x, y, explorationTime))
 
     depots = []
-
     # first we add the central depot named "0"
     # and depot named "numberOfCustomers + 1" its corresponding depot for self-loops paths
+    timeWindowsIdx = 0
     x = random.random() * maxDistance
     y = random.random() * maxDistance
     depots.append(Node(str(0), x, y, -1))
-    depots.append(Node(str(numberOfCustomers + 1), x, y, -1))
+    depots.append(Node(str(numberOfCustomers + 1), x, y, -1, timeWindows[timeWindowsIdx]))
 
     name = numberOfCustomers + 2  # names of the real depots other than the central depot
     for i in range(numberOfCustomers+2, numberOfCustomers + numberOfDepots+1):
+        timeWindowsIdx += 1
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
-        depots.append(Node(str(name), x, y, -1))  # the depot has no exploration time : so -1 by default
-        depots.append(Node(str(name+1), x, y, -1))  # we duplicate each depot
+        depots.append(Node(str(name), x, y, -1, timeWindows[timeWindowsIdx]))  # -1 indicates no service time for the depot
+        depots.append(Node(str(name+1), x, y, -1, timeWindows[timeWindowsIdx]))  # we duplicate each depot
         name += 2
 
     # generation of a graph allowing the exploration of the complete graph and also the self circuits
