@@ -24,7 +24,7 @@ def main():
     # print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
 
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
-    generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
+    generateInputFileWithLegs = False  # boolean used to decide if the input files are generated with the the legs enumeration or not
     generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
     antiSymmetry = False  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive

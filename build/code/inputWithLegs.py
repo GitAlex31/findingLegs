@@ -101,8 +101,8 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals):
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False,
-                              printStatistics=False, VrpGencolFormatting=False, antiSymmetry=False, timeIntervals=None):
+def createGENCOLInputFileNodesAndArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False,
+                                      printStatistics=False, VrpGencolFormatting=False, antiSymmetry=False, timeIntervals=None):
 
     simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
 
@@ -116,9 +116,9 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
 
         for i, depot in enumerate(g.getRealDepots()):  # first we create the "normal" nodes
             myFile.write(
-                "N{} [{} {}] [0 9999]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
+                "N{} [{} {}] [0 9999] <A{}>; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1], str(depot.getName())))
             myFile.write(
-                "N{} [{} {}] [0 9999]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
+                "N{} [{} {}] [0 9999] <D{}>; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1], str(depot.getName())))
 
         myFile.write("Destination [0 86400] [0 9999];\n")
 
@@ -232,7 +232,7 @@ def createGENCOLInputFileNetwork(fileName):
 
 def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
                                   recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False, antiSymmetryArcs=False):
-    """Creates the complete GENCOL input file used by GENCOL to solve the VRP-TW"""
+    """Creates the complete GENCOL input file used by GENCOL to solve the VRPTW"""
     fileName = "../output/" + fileName  # builds the GENCOL input file into the right directory
     createGENCOLInputFile(fileName)
     createGENCOLInputFileResources(fileName)
@@ -240,8 +240,8 @@ def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSp
     createGENCOLInputFileTasks(fileName, g)
     createGENCOLInputFileColumns(fileName, fixedCost)
     createGENCOLInputFileNodes(fileName, g, timeIntervals)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics,
-                              VrpGencolFormatting, antiSymmetryArcs)
+    createGENCOLInputFileNodesAndArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics,
+                                      VrpGencolFormatting, antiSymmetryArcs)
     createGENCOLInputFileNetwork(fileName)
     pass
 
@@ -272,7 +272,7 @@ def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, dron
     if not antiSymmetryArcs:
         createGENCOLInputFileNodes(fileName, g, timeIntervals)
     createVrpGENCOLFileArcSets(fileName)
-    createGENCOLInputFileArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics,
-                              VrpGencolFormatting, antiSymmetryArcs, timeIntervals)
+    createGENCOLInputFileNodesAndArcs(fileName, g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics,
+                                      VrpGencolFormatting, antiSymmetryArcs, timeIntervals)
     createVrpGENCOLInputFileNetwork(fileName)
     pass
