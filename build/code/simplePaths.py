@@ -107,81 +107,89 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
 
     customers = g.getCustomers()
     # first we create the legs between the recharging stations, excluding legs for the same depot visiting no customers
+    
+    totalUnfeasibility = True
     if int((node_s.computeDistance(node_t) / droneSpeed) * 60) <= droneAutonomy:
+        totalUnfeasibility = False
         if node_t != associatedDepot:
             simplePaths.append([node_s, node_t])
             simplePathsLeg.append(graph.Path([node_s, node_t]))
 
-    for i, customer in enumerate(customers):  # we build legs with 1 customer only
-        temporaryList = [node_s, customer, node_t]
-        candidateRoute = graph.Path(temporaryList)
-        candidateRouteLength = candidateRoute.computeLengthWithDistanceMatrix(g, droneSpeed)
+    if not totalUnfeasibility:
 
-        if candidateRouteLength < droneAutonomy:
+        for i, customer in enumerate(customers):  # we build legs with 1 customer only
+            temporaryList = [node_s, customer, node_t]
+            candidateRoute = graph.Path(temporaryList)
+            candidateRouteLength = candidateRoute.computeLengthWithDistanceMatrix(g, droneSpeed)
+            totalUnfeasibility1 = True
 
-            simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
-            simplePathsLeg.append(graph.Path(temporaryList[:]))
+            if candidateRouteLength < droneAutonomy:
 
+                simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
+                simplePathsLeg.append(graph.Path(temporaryList[:]))
+                totalUnfeasibility1 = False
 
-            for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
+            if not totalUnfeasibility1:
 
-                temporaryList2 = [customer, customer2]
-                permutations2 = list(itertools.permutations(temporaryList2))  # candidate routes with 2 customers
-                leastCostLeg2 = [node_s] + list(permutations2[0]) + [node_t]  # initialization of the least cost route
-                # filtering of the legs containing the same subset of customers by cost minimization
-                # the autonomy of the drone has to be respected
-                totalUnfeasibility2 = True
-                for perm2 in permutations2:
-                    legList2 = [node_s] + list(perm2) + [node_t]
-                    legPathObject2 = graph.Path(legList2)
-                    if (legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed) <= graph.Path(leastCostLeg2).computeLengthWithDistanceMatrix(g, droneSpeed))\
-                            and (legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
-                        totalUnfeasibility2 = False
-                        leastCostLeg2 = [node_s] + list(perm2) + [node_t]
+                for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
 
-                simplePaths.append(leastCostLeg2)
-                simplePathsLeg.append(graph.Path(leastCostLeg2))
+                    temporaryList2 = [customer, customer2]
+                    permutations2 = list(itertools.permutations(temporaryList2))  # candidate routes with 2 customers
+                    leastCostLeg2 = [node_s] + list(permutations2[0]) + [node_t]  # initialization of the least cost route
+                    # filtering of the legs containing the same subset of customers by cost minimization
+                    # the autonomy of the drone has to be respected
+                    totalUnfeasibility2 = True
+                    for perm2 in permutations2:
+                        legList2 = [node_s] + list(perm2) + [node_t]
+                        legPathObject2 = graph.Path(legList2)
+                        if (legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed) <= graph.Path(leastCostLeg2).computeLengthWithDistanceMatrix(g, droneSpeed))\
+                                and (legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
+                            totalUnfeasibility2 = False
+                            leastCostLeg2 = [node_s] + list(perm2) + [node_t]
 
-                if not totalUnfeasibility2:
+                    simplePaths.append(leastCostLeg2)
+                    simplePathsLeg.append(graph.Path(leastCostLeg2))
 
-                    for k, customer3 in enumerate(customers[j+1:], start=j+1):  # now 3 customers in the route
+                    if not totalUnfeasibility2:
 
-                        temporaryList3 = [customer, customer2, customer3]
-                        permutations3 = list(itertools.permutations(temporaryList3))  # candidate routes with 3 customers
-                        leastCostLeg3 = [node_s] + list(permutations3[0]) + [node_t]
-                        totalUnfeasibility3 = True
-                        for perm3 in permutations3:
-                            legList3 = [node_s] + list(perm3) + [node_t]
-                            legPathObject3 = graph.Path(legList3)
-                            if (legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed) <=
-                                    graph.Path(leastCostLeg3).computeLengthWithDistanceMatrix(g, droneSpeed)) \
-                                    and (legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
-                                totalUnfeasibility3 = False
-                                leastCostLeg3 = [node_s] + list(perm3) + [node_t]
+                        for k, customer3 in enumerate(customers[j+1:], start=j+1):  # now 3 customers in the route
 
-                        simplePaths.append(leastCostLeg3)
-                        simplePathsLeg.append(graph.Path(leastCostLeg3))
+                            temporaryList3 = [customer, customer2, customer3]
+                            permutations3 = list(itertools.permutations(temporaryList3))  # candidate routes with 3 customers
+                            leastCostLeg3 = [node_s] + list(permutations3[0]) + [node_t]
+                            totalUnfeasibility3 = True
+                            for perm3 in permutations3:
+                                legList3 = [node_s] + list(perm3) + [node_t]
+                                legPathObject3 = graph.Path(legList3)
+                                if (legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed) <=
+                                        graph.Path(leastCostLeg3).computeLengthWithDistanceMatrix(g, droneSpeed)) \
+                                        and (legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
+                                    totalUnfeasibility3 = False
+                                    leastCostLeg3 = [node_s] + list(perm3) + [node_t]
 
-                        if not totalUnfeasibility3:
+                            simplePaths.append(leastCostLeg3)
+                            simplePathsLeg.append(graph.Path(leastCostLeg3))
 
-                            for l, customer4 in enumerate(customers[k+1:], start=k+1):  # now 4 customers in the route
+                            if not totalUnfeasibility3:
 
-                                temporaryList = [customer, customer2, customer3, customer4]
-                                permutations4 = list(
-                                    itertools.permutations(temporaryList))  # candidate routes with 4 customers
-                                leastCostLeg4 = [node_s] + list(permutations4[0]) + [node_t]
-                                totalUnfeasibility4 = True
-                                for perm4 in permutations4:
-                                    legList4 = [node_s] + list(perm4) + [node_t]
-                                    legPathObject4 = graph.Path(legList4)
-                                    if (legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed) <= graph.Path(
-                                            leastCostLeg4).computeLengthWithDistanceMatrix(g, droneSpeed)) \
-                                            and (legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
-                                        totalUnfeasibility4 = False
-                                        leastCostLeg4 = [node_s] + list(perm4) + [node_t]
+                                for l, customer4 in enumerate(customers[k+1:], start=k+1):  # now 4 customers in the route
 
-                                simplePaths.append(leastCostLeg4)
-                                simplePathsLeg.append(graph.Path(leastCostLeg4))
+                                    temporaryList = [customer, customer2, customer3, customer4]
+                                    permutations4 = list(
+                                        itertools.permutations(temporaryList))  # candidate routes with 4 customers
+                                    leastCostLeg4 = [node_s] + list(permutations4[0]) + [node_t]
+                                    totalUnfeasibility4 = True
+                                    for perm4 in permutations4:
+                                        legList4 = [node_s] + list(perm4) + [node_t]
+                                        legPathObject4 = graph.Path(legList4)
+                                        if (legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed) <= graph.Path(
+                                                leastCostLeg4).computeLengthWithDistanceMatrix(g, droneSpeed)) \
+                                                and (legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
+                                            totalUnfeasibility4 = False
+                                            leastCostLeg4 = [node_s] + list(perm4) + [node_t]
+
+                                    simplePaths.append(leastCostLeg4)
+                                    simplePathsLeg.append(graph.Path(leastCostLeg4))
 
     return simplePaths, simplePathsLeg
 
