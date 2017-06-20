@@ -110,7 +110,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
 
     totalUnfeasibility = True
     candidateRouteLength = int((node_s.computeDistance(node_t) / droneSpeed) * 60)
-    if candidateRouteLength <= droneAutonomy:
+    if (candidateRouteLength <= droneAutonomy) and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
         totalUnfeasibility = False
         if node_t != associatedDepot:
             simplePaths.append([node_s, node_t])
@@ -124,7 +124,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
             candidateRouteLength = candidateRoute.computeLengthWithDistanceMatrix(g, droneSpeed)
             totalUnfeasibility1 = True
 
-            if candidateRouteLength < droneAutonomy:
+            if (candidateRouteLength < droneAutonomy) and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
 
                 simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
                 simplePathsLeg.append(graph.Path(temporaryList[:]))
@@ -145,7 +145,8 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                         legPathObject2 = graph.Path(legList2)
                         candidateRouteLength = legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed)
                         if (candidateRouteLength <= graph.Path(leastCostLeg2).computeLengthWithDistanceMatrix(g, droneSpeed))\
-                                and (candidateRouteLength <= droneAutonomy):
+                                and (candidateRouteLength <= droneAutonomy)\
+                                and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
                             totalUnfeasibility2 = False
                             leastCostLeg2 = [node_s] + list(perm2) + [node_t]
 
@@ -164,9 +165,9 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                 legList3 = [node_s] + list(perm3) + [node_t]
                                 legPathObject3 = graph.Path(legList3)
                                 candidateRouteLength = legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed)
-                                if (candidateRouteLength <=
-                                        graph.Path(leastCostLeg3).computeLengthWithDistanceMatrix(g, droneSpeed)) \
-                                        and (candidateRouteLength <= droneAutonomy):
+                                if (candidateRouteLength <= graph.Path(leastCostLeg3).computeLengthWithDistanceMatrix(g, droneSpeed)) \
+                                        and (candidateRouteLength <= droneAutonomy)\
+                                        and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
                                     totalUnfeasibility3 = False
                                     leastCostLeg3 = [node_s] + list(perm3) + [node_t]
 
@@ -186,15 +187,16 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                         legList4 = [node_s] + list(perm4) + [node_t]
                                         legPathObject4 = graph.Path(legList4)
                                         candidateRouteLength = legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed)
-                                        if (candidateRouteLength <= graph.Path(
-                                                leastCostLeg4).computeLengthWithDistanceMatrix(g, droneSpeed)) \
-                                                and (candidateRouteLength <= droneAutonomy):
+                                        if (candidateRouteLength <= graph.Path(leastCostLeg4).computeLengthWithDistanceMatrix(g, droneSpeed)) \
+                                                and (candidateRouteLength <= droneAutonomy)\
+                                                and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
                                             totalUnfeasibility4 = False
                                             leastCostLeg4 = [node_s] + list(perm4) + [node_t]
 
                                     simplePaths.append(leastCostLeg4)
                                     simplePathsLeg.append(graph.Path(leastCostLeg4))
 
+    print([[node.getName() for node in trip] for trip in simplePaths])
     return simplePaths, simplePathsLeg
 
 
