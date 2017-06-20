@@ -95,7 +95,8 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
     depotsListForGraphExploration = g.getRealDepots()
     depotsListForSelfLoops = g.getOtherDepots()
     try:
-        associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(node_s)]  # real depot associated
+        # real depot associated if the depot is a virtual one
+        associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(node_s)]
     except:
         associatedDepot = None
 
@@ -103,15 +104,13 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
 
     simplePaths = []
     simplePathsLeg = []
-    identity = 0  # identity begins by 1 by incrementation
 
     customers = g.getCustomers()
     # first we create the legs between the recharging stations, excluding legs for the same depot visiting no customers
     if int((node_s.computeDistance(node_t) / droneSpeed) * 60) <= droneAutonomy:
         if node_t != associatedDepot:
-            identity += 1
             simplePaths.append([node_s, node_t])
-            simplePathsLeg.append(graph.Path([node_s, node_t], identity))
+            simplePathsLeg.append(graph.Path([node_s, node_t]))
 
     for i, customer in enumerate(customers):  # we build legs with 1 customer only
         temporaryList = [node_s, customer, node_t]
@@ -121,8 +120,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
         if candidateRouteLength < droneAutonomy:
 
             simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
-            identity += 1
-            simplePathsLeg.append(graph.Path(temporaryList[:], identity))
+            simplePathsLeg.append(graph.Path(temporaryList[:]))
 
 
             for j, customer2 in enumerate(customers[i+1:], start=i+1):  # now 2 customers in the route if possible
@@ -142,8 +140,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                         leastCostLeg2 = [node_s] + list(perm2) + [node_t]
 
                 simplePaths.append(leastCostLeg2)
-                identity += 1
-                simplePathsLeg.append(graph.Path(leastCostLeg2, identity))
+                simplePathsLeg.append(graph.Path(leastCostLeg2))
 
                 if not totalUnfeasibility2:
 
@@ -163,8 +160,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                 leastCostLeg3 = [node_s] + list(perm3) + [node_t]
 
                         simplePaths.append(leastCostLeg3)
-                        identity += 1
-                        simplePathsLeg.append(graph.Path(leastCostLeg3, identity))
+                        simplePathsLeg.append(graph.Path(leastCostLeg3))
 
                         if not totalUnfeasibility3:
 
@@ -185,8 +181,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                         leastCostLeg4 = [node_s] + list(perm4) + [node_t]
 
                                 simplePaths.append(leastCostLeg4)
-                                identity += 1
-                                simplePathsLeg.append(graph.Path(leastCostLeg4, identity))
+                                simplePathsLeg.append(graph.Path(leastCostLeg4))
 
     return simplePaths, simplePathsLeg
 
