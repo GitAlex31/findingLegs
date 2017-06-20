@@ -107,9 +107,10 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
 
     customers = g.getCustomers()
     # first we create the legs between the recharging stations, excluding legs for the same depot visiting no customers
-    
+
     totalUnfeasibility = True
-    if int((node_s.computeDistance(node_t) / droneSpeed) * 60) <= droneAutonomy:
+    candidateRouteLength = int((node_s.computeDistance(node_t) / droneSpeed) * 60)
+    if candidateRouteLength <= droneAutonomy:
         totalUnfeasibility = False
         if node_t != associatedDepot:
             simplePaths.append([node_s, node_t])
@@ -142,8 +143,9 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                     for perm2 in permutations2:
                         legList2 = [node_s] + list(perm2) + [node_t]
                         legPathObject2 = graph.Path(legList2)
-                        if (legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed) <= graph.Path(leastCostLeg2).computeLengthWithDistanceMatrix(g, droneSpeed))\
-                                and (legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
+                        candidateRouteLength = legPathObject2.computeLengthWithDistanceMatrix(g, droneSpeed)
+                        if (candidateRouteLength <= graph.Path(leastCostLeg2).computeLengthWithDistanceMatrix(g, droneSpeed))\
+                                and (candidateRouteLength <= droneAutonomy):
                             totalUnfeasibility2 = False
                             leastCostLeg2 = [node_s] + list(perm2) + [node_t]
 
@@ -161,9 +163,10 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                             for perm3 in permutations3:
                                 legList3 = [node_s] + list(perm3) + [node_t]
                                 legPathObject3 = graph.Path(legList3)
-                                if (legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed) <=
+                                candidateRouteLength = legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed)
+                                if (candidateRouteLength <=
                                         graph.Path(leastCostLeg3).computeLengthWithDistanceMatrix(g, droneSpeed)) \
-                                        and (legPathObject3.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
+                                        and (candidateRouteLength <= droneAutonomy):
                                     totalUnfeasibility3 = False
                                     leastCostLeg3 = [node_s] + list(perm3) + [node_t]
 
@@ -182,9 +185,10 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                     for perm4 in permutations4:
                                         legList4 = [node_s] + list(perm4) + [node_t]
                                         legPathObject4 = graph.Path(legList4)
-                                        if (legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed) <= graph.Path(
+                                        candidateRouteLength = legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed)
+                                        if (candidateRouteLength <= graph.Path(
                                                 leastCostLeg4).computeLengthWithDistanceMatrix(g, droneSpeed)) \
-                                                and (legPathObject4.computeLengthWithDistanceMatrix(g, droneSpeed) <= droneAutonomy):
+                                                and (candidateRouteLength <= droneAutonomy):
                                             totalUnfeasibility4 = False
                                             leastCostLeg4 = [node_s] + list(perm4) + [node_t]
 
