@@ -1,19 +1,20 @@
 # Author : Alexandre Dossin
 
 import graph, simplePaths, inputWithLegs, inputWithoutLegs, display
-import time, pickle
+import time, pickle, random
 
 def main():
 
-    numberOfCustomers = 2
+    numberOfCustomers = 7
     numberOfDepots = 2
     maxDistance = 1000  # in meters
+    random.seed(123)  # useful for debugging purposes
     timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
-    if numberOfCustomers >= 1 and numberOfDepots >= 2:
+    if numberOfCustomers >= 1 and numberOfDepots >= 1:
         g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows)  # building a random graph
         pickle.dump(g, open("../temp/graph.p", "wb"))
     else:
-        raise ValueError("The network must have at least 1 customer and 2 depots.")
+        raise ValueError("The network must have at least 1 customer and 1 depot.")
 
     #print(g)
 
@@ -25,8 +26,9 @@ def main():
     # print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
 
     generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
-    generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
-    antiSymmetryBool = True  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
+    generateInputFileWithLegs = True
+    if generateInputFileWithLegs:  # boolean used to decide if the input files are generated with the the legs enumeration or not
+        antiSymmetryBool = True  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     if generateInputFileWithLegs:

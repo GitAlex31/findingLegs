@@ -63,10 +63,10 @@ def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAut
     droneAutonomy *= 60  # converting minutes to seconds
     serviceTime *= 60
 
-    if VrpGencolFormatting:
-        myFile.write("Source N0dep 0 as [0 0] (RowVeh -1);\n")
-    else:
-        myFile.write("Source N0dep 0 [0 0] (RowVeh -1);\n")
+    # if VrpGencolFormatting:
+    #     myFile.write("Source N0dep 0 as [0 0] (RowVeh -1);\n")
+    # else:
+    #     myFile.write("Source N0dep 0 [0 0] (RowVeh -1);\n")
 
     for customer in g.getCustomers():  # writing rows between customers
         for otherCustomer in g.getCustomers():
@@ -107,8 +107,10 @@ def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAut
     for depot in g.getRealDepots():  # writing rows between depots and Destination
         time = int((g.distanceMatrix[0][int(depot.getName())] / droneSpeed) * 60)
         if VrpGencolFormatting:
+            myFile.write("Source N{0}dep {1} as [{1} {1}] (RowVeh -1);\n".format(depot.getName(), time))
             myFile.write("N{0}arr Destination {1} as [{1} {1}];\n".format(depot.getName(), time))
         else:
+            myFile.write("Source N{0}dep {1} [{1} {1}] (RowVeh -1);\n".format(depot.getName(), time))
             myFile.write("N{0}arr Destination {1} [{1} {1}];\n".format(depot.getName(), time))
     myFile.write("};\n\n")
 

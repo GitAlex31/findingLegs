@@ -196,7 +196,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=600, droneAutonomy=25):
                                     simplePaths.append(leastCostLeg4)
                                     simplePathsLeg.append(graph.Path(leastCostLeg4))
 
-    print([[node.getName() for node in trip] for trip in simplePaths])
+    #print([[node.getName() for node in trip] for trip in simplePaths])
     return simplePaths, simplePathsLeg
 
 
@@ -282,7 +282,10 @@ def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=
     if separatedTW:
         timeStep = int(float(86400) / numberOfDepots)
         for i in range(numberOfDepots):
-            timeWindows.append([timeStep * i, timeStep * (i + 1)])
+            if False:#i == 0:  # the recharging station of the central depot is open all day
+                timeWindows.append([0, 86400])
+            else:
+                timeWindows.append([timeStep * i, timeStep * (i + 1)])
 
     if randomTW:
         for i in range(numberOfDepots):

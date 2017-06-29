@@ -152,9 +152,11 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
     for depot in g.getRealDepots()[1:]:  # we exclude the source depot whose arc has already been written
         time = int(depot.computeDistance(g.getNode(0)) / droneSpeed * 60)  # computation of the time in seconds
         if VrpGencolFormatting:
+            myFile.write("Source N{0}dep {1} as [{1}] (RowVeh -1);\n".format(depot.getName(), time))
             myFile.write("N{0}arr Destination {1} as [{1}];\n".format(depot.getName(), time))
         else:
-            myFile.write("N{0}arr Destination {1} [{1}];\n".format(depot.getName(), time))
+            myFile.write("Source N{0}dep {1} [{1}];\n".format(depot.getName(), time))
+            myFile.write("N{0}arr Destination {1} [{1}] (RowVeh -1);\n".format(depot.getName(), time))
 
     # finally we add the arc corresponding to the battery charging that we initialize to zero for the moment
     for depot in g.getRealDepots():
