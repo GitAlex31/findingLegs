@@ -5,11 +5,22 @@ import time, pickle, random
 
 def main():
 
-    numberOfCustomers = 7
+    numberOfCustomers = 15
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     random.seed(123)  # useful for debugging purposes
-    timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
+
+    # choice of the time windows
+    timeWindowsType = "tight"
+    if timeWindowsType == "tight":
+        timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
+    elif timeWindowsType == "random":
+        timeWindows = simplePaths.buildTimeWindows(numberOfDepots, randomTW=True)
+    elif timeWindowsType == "separated":
+        timeWindows = simplePaths.buildTimeWindows(numberOfDepots, separatedTW=True)
+    else:
+        raise ValueError("Time windows not specified.")
+
     if numberOfCustomers >= 1 and numberOfDepots >= 1:
         g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows)  # building a random graph
         pickle.dump(g, open("../temp/graph.p", "wb"))
@@ -26,9 +37,8 @@ def main():
     # print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
 
     generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
-    generateInputFileWithLegs = True
-    if generateInputFileWithLegs:  # boolean used to decide if the input files are generated with the the legs enumeration or not
-        antiSymmetryBool = True  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
+    generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
+    antiSymmetryBool = True  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
     if generateInputFileWithLegs:
@@ -40,7 +50,7 @@ def main():
         else:
             fileName = "problem{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight15")
 
-        # if uncommented, returns an informative text file on the generated legs (can take time)
+        # if uncommented, returns an informative text file on the generated legs (can take a long time)
         #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
 
         if generateInputFileForVrpGencol:
