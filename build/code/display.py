@@ -1,7 +1,8 @@
 # Author : Alexandre Dossin
 
 from tkinter import Tk, Canvas, Frame
-from PIL import Image, ImageDraw
+#from PIL import Image, ImageDraw
+import subprocess
 import re  # package used to do manipulate strings in a more flexible way than standard operations
 import pickle
 
@@ -66,10 +67,10 @@ class Window(Frame):
         self.pack(fill='both', expand=1)  # pack the Window in the main widget
         canvas = Canvas(self)  # a canvas is a widget on which we draw shapes
 
-        # PIL create an empty image and draw object to draw on
-        # memory only, not visible
-        image = Image.new("RGB", (1100, 600), color=(255, 255, 255))
-        draw = ImageDraw.Draw(image)
+        # # PIL create an empty image and draw object to draw on
+        # # memory only, not visible
+        # image = Image.new("RGB", (1100, 600), color=(255, 255, 255))
+        # draw = ImageDraw.Draw(image)
 
         # customers are represented by circles, depots by squares
         for customer in self.customers:
@@ -78,7 +79,7 @@ class Window(Frame):
 
             size = 10  # size of the circles
             canvas.create_oval(x, y, x + size, y + size)
-            draw.ellipse((x, y, x + size, y + size), outline=(0, 0, 0))
+            #draw.ellipse((x, y, x + size, y + size), outline=(0, 0, 0))
 
         for depot in self.depots:
             x = depot.getCoordinates()[0] / 2
@@ -87,31 +88,41 @@ class Window(Frame):
 
             if depot.getName() == '0':  # special case for the central depot
                 canvas.create_rectangle(x, y, x + size, y + size, fill='blue')
-                draw.rectangle((x, y, x + size, y + size), outline=(0, 0, 0), fill=(0, 0, 255))
+                #draw.rectangle((x, y, x + size, y + size), outline=(0, 0, 0), fill=(0, 0, 255))
             else:
                 canvas.create_rectangle(x, y, x + size, y + size)
-                draw.rectangle((x, y, x + size, y + size), outline=(0, 0, 0))
-
+                #draw.rectangle((x, y, x + size, y + size), outline=(0, 0, 0))
 
         routes = solutionFileToRoutesList(g, self.solutionFileName)  # we get the routes from the solution file
 
         colors = ['black', 'red', 'green', 'blue', 'cyan', 'yellow', 'magenta']
-        colorsPIL = [(0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (255, 255, 0), (255, 0, 255)]
+        #colorsPIL = [(0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (255, 255, 0), (255, 0, 255)]
 
         for colorIdx, route in enumerate(routes):  # we then draw the routes on the canvas
             for i in range(len(route)-1):
+                coordinatesCentralDepot = tuple(i / 2 + 5 for i in route[0].getCoordinates())
                 coordinates1 = tuple(i / 2 + 5 for i in route[i].getCoordinates())
                 coordinates2 = tuple(i / 2 + 5 for i in route[i+1].getCoordinates())
                 canvas.create_line(coordinates1, coordinates2, arrow='last', fill=colors[colorIdx])
-                coordinatesPIL = coordinates1 + coordinates2
-                draw.line(coordinatesPIL, width=1, fill=colorsPIL[colorIdx])
-                
+                # coordinatesPIL = coordinates1 + coordinates2
+                # draw.line(coordinatesPIL, width=1, fill=colorsPIL[colorIdx])
+
+                # we draw the arc from the last intermediate depot to the central depot (named Destination)
+                if (i == len(route) - 2) and route[i+1] != route[0]:
+                    canvas.create_line(coordinates2, coordinatesCentralDepot, arrow='last', fill=colors[colorIdx])
+
         canvas.pack(fill='both', expand=1, padx=70)  # packing of the canvas in the Window object
         # padx translates the canvas to the right
 
-        # PIL image can be saved as .png .jpg .gif or .bmp file (among others)
-        filename = "my_drawing.jpg"
-        image.save(filename)
+        # # PIL image can be saved as .png .jpg .gif or .bmp file (among others)
+        # filename = "routes.jpg"
+        # image.save(filename)
+
+        # generating a postscript document
+        canvas.update()  # what does it do ?
+        canvas.postscript(file="routes.ps", colormode='color', width=500, height=600)
+        # then convert it to a pdf file
+        subprocess.Popen(["ps2pdf", "routes.ps", "routes.pdf"], shell=True)
 
 if __name__ == '__main__':
     VrpGencolSolutionFileName = input("Please enter VrpGencol solution file name :")
