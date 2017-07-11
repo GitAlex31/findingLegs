@@ -263,6 +263,7 @@ def exploreAllSimplePaths(g, droneSpeed=600, droneAutonomy=25, recursiveAlgorith
         numberOfPathsForOneSelfLoop = math.factorial(numberOfCustomers) * sum(
             [1 / math.factorial(k) for k in range(numberOfCustomers + 1)])
         totalNumberPaths += numberOfPathsForOneSelfLoop * numberOfDepots
+        totalNumberPaths -= numberOfDepots
 
         print("Total possible number of paths : {}".format(totalNumberPaths))
         fracPaths = len(allSimplePaths) / totalNumberPaths
@@ -299,6 +300,6 @@ def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=
     if tightTW:
         for i in range(numberOfDepots):
             start = random.randint(0, 86400)
-            timeWindows.append([start, start + 900])  # a tight time window of 15 minutes is considered
+            timeWindows.append([start, start + 36000])  # a tight time window of 600 minutes is considered
 
     return timeWindows

@@ -1,11 +1,11 @@
 # Author : Alexandre Dossin
 
-import graph, simplePaths, inputWithLegs, inputWithoutLegs, display
+import graph, simplePaths, inputWithLegs, inputWithoutLegs
 import time, pickle, random
 
 def main():
 
-    numberOfCustomers = 15
+    numberOfCustomers = 10
     numberOfDepots = 2
     maxDistance = 1000  # in meters
     random.seed(123)  # useful for debugging purposes
@@ -54,9 +54,9 @@ def main():
         #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
 
         if generateInputFileForVrpGencol:
-            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True, antiSymmetry=antiSymmetryBool)
+            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=30, recursiveAlgorithm=False, printStatistics=True, antiSymmetry=antiSymmetryBool)
         else:
-            inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False, printStatistics=True)
+            inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=30, recursiveAlgorithm=False, printStatistics=True)
     else:
         if generateInputFileForVrpGencol:
             fileName = "problemVrp{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
@@ -64,9 +64,9 @@ def main():
             fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
 
         if generateInputFileForVrpGencol:
-            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=600, droneAutonomy=25)
+            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=30)
         else:
-            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=600, droneAutonomy=25)
+            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=30)
 
 
 if __name__ == '__main__':

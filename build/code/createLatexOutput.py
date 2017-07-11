@@ -10,6 +10,11 @@ def createLatexOutputResults(reportFileName):
     instanceName = reportFileName[idx1:idx2]
     with open(reportFileName, 'r') as reportFile:  # with open automatically closes the file when not used anymore
 
+        bestFeasibleSolution = 0
+        numberOfVehicles = 0
+        entireTime = 0
+        bestRelaxationCost = 0
+
         for line in reportFile:
             if "Best feasible solution" in line:
                 idx1 = line.index(":")
@@ -39,8 +44,9 @@ def createLatexOutputResults(reportFileName):
     latexTable += "\n\hline\n"
     latexTable += "end{tabular}"
 
-    print(latexTable)
+    #print(latexTable)
     return latexTable
+
 
 if __name__ == '__main__':
     reportFileName = input("Please enter VrpGencol report file name :")
