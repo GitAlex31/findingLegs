@@ -9,7 +9,8 @@ def createSummaryFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAl
     list of its visited customers or sites.
     Beware : the returned text is only informative but not used by GENCOL or other program in any way."""
 
-    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy,
+                                                                            recursiveAlgorithm, printStatistics)
 
     fileName = "../output/" + fileName  # builds the input file into the right directory
     myFile = open(fileName, "w")
@@ -107,7 +108,8 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals, antiSymmetry):
 def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False,
                               printStatistics=False, VrpGencolFormatting=False):
 
-    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy, recursiveAlgorithm, printStatistics)
+    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy,
+                                                                            recursiveAlgorithm, printStatistics)
 
     myFile = open(fileName, 'a')
 
