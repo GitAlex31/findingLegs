@@ -6,7 +6,7 @@ import time, pickle, random
 def main():
 
     numberOfCustomers = 10
-    numberOfDepots = 2
+    numberOfDepots = 1
     maxDistance = 1000  # in meters
     random.seed(123)  # useful for debugging purposes
 
@@ -29,12 +29,12 @@ def main():
 
     #print(g)
 
-    # allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)[0]
-    # allSimplePathsNonRecursiveLeg = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)[1]
-    # allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
-    # print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
-    # print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
-    # print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
+    #allSimplePathsNonRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)[0]
+    #allSimplePathsNonRecursiveLeg = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=False, printStatistics=True)[1]
+    #allSimplePathsRecursive = simplePaths.exploreAllSimplePaths(g, recursiveAlgorithm=True, printStatistics=True)
+    #print([[node.getName() for node in trip] for trip in allSimplePathsRecursive])
+    #print([[node.getName() for node in trip] for trip in allSimplePathsNonRecursive])
+    #print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
 
     generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
     generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
@@ -44,29 +44,29 @@ def main():
     if generateInputFileWithLegs:
         if generateInputFileForVrpGencol:
             if not antiSymmetryBool:
-                fileName = "problemVrp{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight15")
+                fileName = "problemVrp{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight60")
             else:
-                fileName = "problemVrp{}_{}_{}_as.out".format(numberOfCustomers, numberOfDepots, "tight15")
+                fileName = "problemVrp{}_{}_{}_as.out".format(numberOfCustomers, numberOfDepots, "tight60")
         else:
-            fileName = "problem{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight15")
+            fileName = "problem{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight60")
 
         # if uncommented, returns an informative text file on the generated legs (can take a long time)
         #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
 
         if generateInputFileForVrpGencol:
-            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=30, recursiveAlgorithm=False, printStatistics=True, antiSymmetry=antiSymmetryBool)
+            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=45, recursiveAlgorithm=False, printStatistics=True, antiSymmetry=antiSymmetryBool)
         else:
-            inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=30, recursiveAlgorithm=False, printStatistics=True)
+            inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=45, recursiveAlgorithm=False, printStatistics=True)
     else:
         if generateInputFileForVrpGencol:
-            fileName = "problemVrp{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
+            fileName = "problemVrp{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight60")
         else:
-            fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight15")
+            fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight60")
 
         if generateInputFileForVrpGencol:
-            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=30)
+            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=45)
         else:
-            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=30)
+            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=45)
 
 
 if __name__ == '__main__':
