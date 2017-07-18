@@ -11,7 +11,7 @@ def main():
     numberOfDepots = 5
     droneAutonomy = 45  # in minutes
     timeWindowsType = "tight60"  # user-defined time windows
-    droneSpeed = 666  # in meters per minute
+    droneSpeed = 666  # in meters per minute (666 m/min -> 40 km/h)
 
     if "tight" in timeWindowsType:
         timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True, TWspacing=int(timeWindowsType[5:]))

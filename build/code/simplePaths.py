@@ -317,69 +317,6 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=30):
     #print([[node.getName() for node in trip] for trip in simplePaths])
     return simplePaths, simplePathsLeg
 
-# def exploreSimplePathsGeneralized(g, s, t, depthRecursion, droneSpeed=666, droneAutonomy=30):
-#     """Function similar to exploreSimplePaths, but generalized to a user chosen depth of recursion."""
-#
-#     # legs without any customer
-#
-#     node_s = g.getNode(s)  # we get the node object from its name
-#     node_t = g.getNode(t)
-#
-#     depotsListForGraphExploration = g.getRealDepots()
-#     depotsListForSelfLoops = g.getOtherDepots()
-#     try:
-#         # real depot associated if the depot is a virtual one
-#         associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(node_s)]
-#     except:
-#         associatedDepot = None
-#
-#     droneAutonomy *= 60  # we do all of our computations in seconds to get the same results as without the legs
-#
-#     simplePaths = []
-#     simplePathsLeg = []
-#
-#     customers = g.getCustomers()
-#     # first we create the legs between the recharging stations, excluding legs for the same depot visiting no customers
-#
-#     totalUnfeasibility = True
-#     candidateRouteLength = int((node_s.computeDistance(node_t) / droneSpeed) * 60)
-#     if (candidateRouteLength <= droneAutonomy) and (
-#             node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
-#         totalUnfeasibility = False
-#         if node_t != associatedDepot:
-#             simplePaths.append([node_s, node_t])
-#             simplePathsLeg.append(graph.Path([node_s, node_t]))
-#
-#     # legs with customers
-#     totalUnfeasibility = True
-#     customerIdx = 0
-#     temporaryList = list()
-#     while customerIdx <= depthRecursion-1:  # while we do not cover all the customers
-#         print("ok")
-#         for customerIdx, customer in enumerate(customers[customerIdx:], start=customerIdx):
-#             temporaryList += [customer]
-#             permutations = list(itertools.permutations(temporaryList))
-#             leastCostLeg = [node_s] + list(permutations[0]) + [node_t]
-#             totalUnfeasibility = True
-#             for perm in permutations:
-#                 legList = [node_s] + list(perm) + [node_t]
-#                 legPathObject = graph.Path(legList)
-#                 candidateRouteLength = legPathObject.computeLengthWithDistanceMatrix(g, droneSpeed)
-#                 if (candidateRouteLength <= graph.Path(leastCostLeg).computeLengthWithDistanceMatrix(g,
-#                                                                                                       droneSpeed)) \
-#                         and (candidateRouteLength <= droneAutonomy) \
-#                         and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
-#                     totalUnfeasibility = False
-#                     leastCostLeg = [node_s] + list(perm) + [node_t]
-#
-#             if not totalUnfeasibility:
-#                 simplePaths.append(leastCostLeg)
-#                 simplePathsLeg.append(graph.Path(leastCostLeg))
-#
-#             customerIdx += 1
-#
-#     return simplePaths, simplePathsLeg
-
 
 def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=30, recursiveAlgorithm=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g,
