@@ -5,15 +5,16 @@ import time, pickle, random
 
 def main():
 
-    numberOfCustomers = 10
-    numberOfDepots = 1
+    random.seed(123)  # useful for debugging purposes - leave as "123"
     maxDistance = 1000  # in meters
-    random.seed(123)  # useful for debugging purposes
+    numberOfCustomers = 15
+    numberOfDepots = 5
+    droneAutonomy = 45  # in minutes
+    timeWindowsType = "tight60"  # user-defined time windows
+    droneSpeed = 666  # in meters per minute
 
-    # choice of the time windows
-    timeWindowsType = "tight"
-    if timeWindowsType == "tight":
-        timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True)
+    if "tight" in timeWindowsType:
+        timeWindows = simplePaths.buildTimeWindows(numberOfDepots, tightTW=True, TWspacing=int(timeWindowsType[5:]))
     elif timeWindowsType == "random":
         timeWindows = simplePaths.buildTimeWindows(numberOfDepots, randomTW=True)
     elif timeWindowsType == "separated":
@@ -44,29 +45,29 @@ def main():
     if generateInputFileWithLegs:
         if generateInputFileForVrpGencol:
             if not antiSymmetryBool:
-                fileName = "problemVrp{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight60")
+                fileName = "problemVrp{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, timeWindowsType)
             else:
-                fileName = "problemVrp{}_{}_{}_as.out".format(numberOfCustomers, numberOfDepots, "tight60")
+                fileName = "problemVrp{}_{}_{}_as.out".format(numberOfCustomers, numberOfDepots, timeWindowsType)
         else:
-            fileName = "problem{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, "tight60")
+            fileName = "problem{}_{}_{}.out".format(numberOfCustomers, numberOfDepots, timeWindowsType)
 
         # if uncommented, returns an informative text file on the generated legs (can take a long time)
         #input.createInputFile(g, "clients.txt", recursiveAlgorithm=False, printStatistics=False)
 
         if generateInputFileForVrpGencol:
-            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=45, recursiveAlgorithm=False, printStatistics=True, antiSymmetry=antiSymmetryBool)
+            inputWithLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=droneSpeed, droneAutonomy=droneAutonomy, recursiveAlgorithm=False, printStatistics=True, antiSymmetry=antiSymmetryBool)
         else:
-            inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=666, droneAutonomy=45, recursiveAlgorithm=False, printStatistics=True)
+            inputWithLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, droneSpeed=droneSpeed, droneAutonomy=droneAutonomy, recursiveAlgorithm=False, printStatistics=True)
     else:
         if generateInputFileForVrpGencol:
-            fileName = "problemVrp{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight60")
+            fileName = "problemVrp{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, timeWindowsType)
         else:
-            fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, "tight60")
+            fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, timeWindowsType)
 
         if generateInputFileForVrpGencol:
-            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=45)
+            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
         else:
-            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=666, droneAutonomy=45)
+            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
 
 
 if __name__ == '__main__':

@@ -456,7 +456,7 @@ def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=30, recursiveAlgorith
     return allSimplePaths, allSimplePathsLeg
 
 
-def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=False):
+def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=False, TWspacing=15):
     """Returns time windows for depots according to different options :
     separetedTW indicates time-windows form an equal partition of the whole day.
     randomTW provides randomly chosen time windows during the whole day."""
@@ -480,8 +480,20 @@ def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=
                 timeWindows.append([b, a])
 
     if tightTW:
+        TWspacing = int(TWspacing * 60)  # converting to seconds
         for i in range(numberOfDepots):
-            start = random.randint(0, 86400)
-            timeWindows.append([start, start + 3600])  # a tight time window of 60 minutes is considered
+            TWstateOk = False
+            while not TWstateOk:
+                start = random.randint(0, 86400-TWspacing)  # we ensure that the time windows are within the day
+                end = start + TWspacing
+                if timeWindows == []:  # base case : timeWindows is empty
+                    timeWindows.append([start, end])  # a tight time window of TWspacing minutes is considered
+                    break
+                else:
+                    for tw in timeWindows:  # we ensure time windows do not overlap
+                        if start >= tw[1] or end <= tw[0]:
+                            TWstateOk = True
+                            timeWindows.append([start, end])  # a tight time window of TWspacing minutes is considered
+                            break
 
     return timeWindows
