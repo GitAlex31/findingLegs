@@ -7,7 +7,7 @@ def main():
 
     random.seed(123)  # useful for debugging purposes - leave as "123"
     maxDistance = 1000  # in meters
-    numberOfCustomers = 15
+    numberOfCustomers = 10
     numberOfDepots = 5
     droneAutonomy = 45  # in minutes
     timeWindowsType = "tight60"  # user-defined time windows
@@ -38,7 +38,7 @@ def main():
     #print([[node.getName() for node in trip.nodesList] for trip in allSimplePathsNonRecursiveLeg])
 
     generateInputFileForVrpGencol = True  # boolean used to decide if the input files are generated for GENCOL or VrpGencol
-    generateInputFileWithLegs = True  # boolean used to decide if the input files are generated with the the legs enumeration or not
+    generateInputFileWithLegs = False  # boolean used to decide if the input files are generated with the the legs enumeration or not
     antiSymmetryBool = True  # boolean used to decide if the input file is generated with the anti symmetry nodes and arcs
     #timeWindows = [[0, 86400]] * numberOfDepots  # for the moment the time windows are not restrictive
     fixedCost = 10000  # if high value, the problem is the minimization of the number of vehicles
@@ -65,9 +65,11 @@ def main():
             fileName = "problem{}_{}_{}_p.out".format(numberOfCustomers, numberOfDepots, timeWindowsType)
 
         if generateInputFileForVrpGencol:
-            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
+            inputWithoutLegs.createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5,
+                                                              droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
         else:
-            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5, droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
+            inputWithoutLegs.createCompleteGENCOLInputFile(fileName, g, fixedCost, timeWindows, serviceTime=5,
+                                                           droneSpeed=droneSpeed, droneAutonomy=droneAutonomy)
 
 
 if __name__ == '__main__':

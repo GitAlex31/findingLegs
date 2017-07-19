@@ -55,7 +55,7 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals, droneAutonomy=25):
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=600, droneAutonomy=25, VrpGencolFormatting=False):
+def createGENCOLInputFileArcs(fileName, g, serviceTime, droneSpeed=666, droneAutonomy=30, VrpGencolFormatting=False):
 
     myFile = open(fileName, 'a')
     myFile.write("Arcs={\n")
@@ -123,8 +123,8 @@ def createGENCOLInputFileNetwork(fileName):
     myFile.write("\n};")
 
 
-def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime,
-                                             droneSpeed=600, droneAutonomy=25, VrpGencolFormatting=False):
+def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime, droneSpeed=666, droneAutonomy=30,
+                                  VrpGencolFormatting=False):
     """Creates the comple GENCOL input file without generating the legs"""
     fileName = "../output/" + fileName  # builds the gencol input file into the right directory
     createGENCOLInputFile(fileName)
@@ -149,8 +149,8 @@ def createVrpGENCOLInputFileNetwork(fileName):
     myFile.write("Net Source (Destination) (as);")
     myFile.write("\n};")
 
-def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime,
-                                             droneSpeed=600, droneAutonomy=25, VrpGencolFormatting=True):
+def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, serviceTime, droneSpeed=666,
+                                     droneAutonomy=30, VrpGencolFormatting=True):
     """Creates the comple GENCOL input file without generating the legs"""
     fileName = "../output/" + fileName  # builds the gencol input file into the right directory
     createGENCOLInputFile(fileName)
