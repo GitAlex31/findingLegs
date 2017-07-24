@@ -387,8 +387,11 @@ def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=30, recursiveAlgorith
         fracPaths = len(allSimplePaths) / totalNumberPaths
         print("Fraction of used paths : {} %".format(fracPaths * 100))
 
+        print("{} & {} & {} & {}".format(len(allSimplePaths), fracPaths * 100, round(mean, 4), max_nbr))  # for copy-paste in LaTeX
+
     print("\n Time used for generating the legs : --- {} seconds --- with {} algorithm"
           .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
+
 
     return allSimplePaths, allSimplePathsLeg
 

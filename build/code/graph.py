@@ -6,8 +6,8 @@ import math, random
 
 class Node(object):
     def __init__(self, name, x, y, serviceTime=0, timeWindow = (0, 86400)):
-        """A node has 4 attributes : its name, coordinates x and y, and a service time
-        Service time is 0 by default and initialized in buildGraph function."""
+        """A node has 4 attributes : its name, coordinates x and y, a service time, and a time window.
+        Service time and time windows are respectively 0 and [0, 86400] (one day) by default. """
         self.name = name
         self.x = x
         self.y = y
@@ -24,16 +24,16 @@ class Node(object):
         return self.timeWindow
 
     def computeDistance(self, other):
-        """Returns the euclidian distance between two node"""
+        """Returns the euclidian distance between two nodes."""
         return math.sqrt(math.pow(self.x - other.x, 2) + math.pow(self.y - other.y, 2))
 
     def __str__(self):
-        """String representation of a Node"""
+        """String representation of a Node."""
         return "Node " + self.name + " with coordinates " + "(" + str(int(self.x)) + "," + str(int(self.y)) + ")" \
                + " and time window [" + str(self.getTimeWindow()[0]) + "," + str(self.getTimeWindow()[1]) + "]"
 
     def __lt__(self, other):
-        """Definition of Node sorting"""
+        """Definition of Node sorting by name index."""
         return int(self.getName()) < int(other.getName())
 
     def __ge__(self, other):
@@ -42,27 +42,28 @@ class Node(object):
 
 class Arc(object):
     def __init__(self, dep, dest):
-        """An arc has two attributes : its departure and destination nodes"""
+        """An arc has two attributes : its departure and destination nodes."""
         self.dep = dep
         self.dest = dest
-        self.dist = Node.computeDistance(self.dep, self.dest)  # the distance is computed internally
+        self.dist = Node.computeDistance(self.dep, self.dest)  # distance between 2 nodes
+        # is an attribute for fast computation
 
     def getSource(self):
         return self.dep
     def getDestination(self):
         return self.dest
-    def getDist(self):
+    def getDistance(self):
         return self.dist
 
     def __str__(self):
-        """String representation of an arc"""
+        """String representation of an arc."""
         return str(self.dep) + '->' + str(self.dest) + ' of distance ' + str(self.dist)
 
 
 class Path(object):
 
     def __init__(self, nodesList):
-        """A path consist in an ordered list of nodes. The origin and destination nodes are not necessarily depots"""
+        """A path consists in an ordered list of nodes."""
         self.nodesList = nodesList
 
     def computeLength(self, speed):
@@ -90,13 +91,13 @@ class Path(object):
 class Digraph(object):
 
     def __init__(self):
-        """A digraph has got an set of nodes and a dictionary of edges, in the form of an adjacency list"""
+        """A Digraph has a set of nodes and a dictionary of edges, in the form of an adjacency list."""
         self.nodes = set([])  # a set in Python is an unordered collection of unique elements
         self.edges = {}
         self.distanceMatrix = None  # initialization of the distance matrix
 
     def addNode(self, node):
-        """Adds node to the set of nodes and an empty list to the dictionary of edges with node key """
+        """Adds node to the set of nodes and an empty list to the dictionary of edges with node key."""
         if node.getName() in self.nodes:
             raise ValueError('Duplicate node')  # verify if the node is not already in the nodes set
         else:
@@ -104,7 +105,7 @@ class Digraph(object):
             self.edges[node] = []
 
     def addEdge(self, edge):
-        """Adds edge of source dep and destination dest in the edges dictionary in the form of an adjacency list"""
+        """Adds edge of source dep and destination dest in the edges dictionary in the form of an adjacency list."""
         dep = edge.getSource()
         dest = edge.getDestination()
         if not (dep in self.nodes and dest in self.nodes):
@@ -112,15 +113,15 @@ class Digraph(object):
         self.edges[dep].append(dest)
 
     def childrenOf(self, node):
-        """Returns the list of the children of node"""
+        """Returns the list of the children of node."""
         return self.edges[node]
 
     def hasNode(self, node):
-        """Returns True if node is in the set of nodes"""
+        """Returns True if node is in the set of nodes."""
         return node in self.nodes
 
     def getNode(self, idx):
-        """Returns node named idx if present in nodes set"""
+        """Returns node named idx if present in nodes set."""
         idx = str(idx)  # str conversion to provide a working comparison
         list_aux = [node for node in self.nodes if node.getName() == idx]
         if list_aux == []:
@@ -129,15 +130,15 @@ class Digraph(object):
             return list_aux[0]
 
     def getNodes(self):
-        """Returns the sorted list of nodes, either a customer or a depot"""
+        """Returns the sorted list of nodes, either a customer or a depot."""
         return sorted(self.nodes)
 
     def getCustomers(self):
-        """Returns the sorted list of nodes that represent customers, i.e. have a service time different from -1"""
+        """Returns the sorted list of nodes that represent customers, i.e. have a service time different from -1."""
         return sorted([node for node in self.nodes if node.getServiceTime() != -1])
 
     def getDepots(self):
-        """Returns the list of nodes that represent depots, i.e. have a service time of -1"""
+        """Returns the list of nodes that represent depots, i.e. have a service time of -1."""
         return [node for node in self.nodes if node.getServiceTime() == -1]
 
     def getRealDepots(self):
@@ -146,12 +147,12 @@ class Digraph(object):
         return [depot for depot in sortedDepotsList if sortedDepotsList.index(depot) % 2 == 0]
 
     def getOtherDepots(self):
-        """Returns the list of virtual depots used for self-loops paths"""
+        """Returns the list of virtual depots used for self-loops paths."""
         sortedDepotsList = sorted(self.getDepots())
         return [depot for depot in sortedDepotsList if sortedDepotsList.index(depot) % 2 != 0]
 
     def __str__(self):
-        """String representation of a Digraph object"""
+        """String representation of a Digraph object."""
         res = ''
         for k in self.edges:
             for d in self.edges[k]:

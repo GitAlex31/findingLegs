@@ -46,10 +46,14 @@ def buildAllResultsDictionary(reportFileNameList):
 
     return allResults
 
-def plotResults(reportFileNameList, dependentVariable):
-    """Plot the results on a graph with the dependent variable (y-axis) being specified, e.g. time."""
+def plotResults(reportFileNameList, yVar, xVar):
+    """Plot the results on a graph with y and x variables specified, e.g. time against number of customers"""
     pass
 
+
 if __name__ == '__main__':
-    reportFileName = input("Please enter VrpGencol report file name :")
+    #reportFileName = input("Please enter VrpGencol report file name :")
+    reportList = ['reportVrp50_2_tight15_as.out']
     #buildResultsDictionary(reportFileName)
+    #print(buildAllResultsDictionary(reportList))
+
