@@ -5,9 +5,9 @@ import math, random
 # graph.py contains the classes implementation : Node, Arc, Path and Digraph classes
 
 class Node(object):
-    def __init__(self, name, x, y, serviceTime=0, timeWindow = (0, 86400)):
+    def __init__(self, name, x, y, serviceTime=0, timeWindow = (0, 3600)):
         """A node has 4 attributes : its name, coordinates x and y, a service time, and a time window.
-        Service time and time windows are respectively 0 and [0, 86400] (one day) by default. """
+        Service time and time windows are respectively 0 and [0, 3600] (one day) by default. """
         self.name = name
         self.x = x
         self.y = y
@@ -24,7 +24,7 @@ class Node(object):
         return self.timeWindow
 
     def computeDistance(self, other):
-        """Returns the euclidian distance between two nodes."""
+        """Returns the euclidian distance between two nodes in meters"""
         return math.sqrt(math.pow(self.x - other.x, 2) + math.pow(self.y - other.y, 2))
 
     def __str__(self):
@@ -46,7 +46,7 @@ class Arc(object):
         self.dep = dep
         self.dest = dest
         self.dist = Node.computeDistance(self.dep, self.dest)  # distance between 2 nodes
-        # is an attribute for fast computation
+        # is an attribute for fast computation (in meters)
 
     def getSource(self):
         return self.dep
@@ -72,19 +72,19 @@ class Path(object):
         length = 0
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
-                length += int(self.nodesList[i].getServiceTime() * 60)
-            length += int(float(self.nodesList[i].computeDistance(self.nodesList[i + 1])) * 60 / speed)
+                length += int(self.nodesList[i].getServiceTime())
+            length += int(float(self.nodesList[i].computeDistance(self.nodesList[i + 1])) / speed)
         return int(length)
 
     def computeLengthWithDistanceMatrix(self, g, speed):
         """Returns the length of the path, without counting the service time of the origin or destination nodes.
         It uses a distance matrix, which is an attribute of the graph, that in turn accelerate the algorithm.
-        Operations are performed in seconds in order to get the same results as the solution without leg generation."""
+        Operations are performed in minutes."""
         length = 0
         for i in range(len(self.nodesList[:-1])):
             if i != 0:
-                length += int(self.nodesList[i].getServiceTime() * 60)
-            length += int((g.distanceMatrix[int(self.nodesList[i].getName())][int(self.nodesList[i+1].getName())] / speed) * 60)
+                length += int(self.nodesList[i].getServiceTime())
+            length += int((g.distanceMatrix[int(self.nodesList[i].getName())][int(self.nodesList[i+1].getName())] / speed))
         return int(length)
 
 

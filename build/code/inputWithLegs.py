@@ -3,7 +3,7 @@
 import simplePaths
 import graph
 
-def createSummaryFile(g, fileName, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=True, printStatistics=False):
+def createSummaryFile(g, fileName, droneSpeed=600, droneAutonomy=45, recursiveAlgorithm=True, printStatistics=False):
     """Returns a text file that contains the list of legs with all the necessary information.
     A leg is represented by a unique id, its time of travel, origin and a destination depots, and the
     list of its visited customers or sites.
@@ -100,12 +100,12 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals, antiSymmetry):
             myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "arr", timeIntervals[i][0], timeIntervals[i][1]))
             myFile.write("N{} [{} {}]; \n".format(str(depot.getName()) + "dep", timeIntervals[i][0], timeIntervals[i][1]))
 
-    myFile.write("Destination [0 86400];\n")
+    myFile.write("Destination [0 3600];\n")
     myFile.write("};\n\n")
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, recursiveAlgorithm=False,
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=45, recursiveAlgorithm=False,
                               printStatistics=False, VrpGencolFormatting=False):
 
     simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy,
@@ -152,7 +152,7 @@ def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=25, rec
         myFile.write("N0arr Destination 0 [0];\n")
 
     for depot in g.getRealDepots()[1:]:  # we exclude the source depot whose arc has already been written
-        time = int(depot.computeDistance(g.getNode(0)) / droneSpeed * 60)  # computation of the time in seconds
+        time = int(depot.computeDistance(g.getNode(0)) / droneSpeed)  # computation of the time in minutes
         if VrpGencolFormatting:
             myFile.write("Source N{0}dep {1} as [{1}] (RowVeh -1);\n".format(depot.getName(), time))
             myFile.write("N{0}arr Destination {1} as [{1}];\n".format(depot.getName(), time))
@@ -179,7 +179,7 @@ def createGENCOLInputFileNetwork(fileName):
     myFile.write("\n};")
 
 
-def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
+def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=45,
                                   recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False, antiSymmetry=True):
     """Creates the complete GENCOL input file used by GENCOL to solve the VRPTW"""
     fileName = "../output/" + fileName  # builds the GENCOL input file into the right directory
@@ -210,7 +210,7 @@ def createVrpGENCOLInputFileNetwork(fileName):
     myFile.close()
 
 
-def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=25,
+def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=45,
                                      recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=True, antiSymmetry=True):
     """Creates the VrpGENCOL input file used by VrpGencol to solve the VRP-TW"""
     fileName = "../output/" + fileName  # builds the VrpGencol input file into the right directory

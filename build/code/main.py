@@ -6,10 +6,10 @@ import sys
 
 def main():
 
-    numberOfCustomersList = [2, 5, 7, 10, 12]
-    numberOfDepotsList = [6]
-    droneAutonomyList = [15, 30, 45]
-    timeWindowsList = ["tight20", "tight35", "tight50"]
+    numberOfCustomersList = [1]
+    numberOfDepotsList = [2]
+    droneAutonomyList = [45]
+    timeWindowsList = ["tight50"]
 
     for numberOfCustomersItr in numberOfCustomersList:
         for droneAutonomyItr in droneAutonomyList:
@@ -17,7 +17,7 @@ def main():
                 for numberOfDepotsItr in numberOfDepotsList:
 
                     random.seed(123)  # useful for debugging purposes - leave as "123"
-                    maxDistance = 1000  # in meters
+                    maxDistance = 5000  # in meters
                     numberOfCustomers = numberOfCustomersItr
                     numberOfDepots = numberOfDepotsItr
                     droneAutonomy = droneAutonomyItr  # in minutes
@@ -86,7 +86,7 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.stdout = open('stdout.txt', 'w')  # writes the standard output to a stdout.txt
+    #sys.stdout = open('stdout.txt', 'w')  # writes the standard output to a stdout.txt
     start_time = time.time()
     main()
     print("\n Time used for main function : --- %s seconds ---" % (time.time() - start_time))

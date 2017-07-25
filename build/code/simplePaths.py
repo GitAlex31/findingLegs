@@ -3,7 +3,7 @@
 import graph
 import math, itertools, time, random
 
-def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=25):
+def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=45):
     """Function that returns the list of all simple paths between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
@@ -85,7 +85,7 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
         return simplePaths
 
 
-def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=30):
+def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=45):
     """Returns the list of least cost simple paths of customers between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
@@ -100,8 +100,6 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=30):
     except:
         associatedDepot = None
 
-    droneAutonomy *= 60  # we do all of our computations in seconds to get the same results as without the legs
-
     simplePaths = []
     simplePathsLeg = []
 
@@ -109,7 +107,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=30):
     # first we create the legs between the recharging stations, excluding legs for the same depot visiting no customers
 
     totalUnfeasibility = True
-    candidateRouteLength = int((node_s.computeDistance(node_t) / droneSpeed) * 60)
+    candidateRouteLength = int(node_s.computeDistance(node_t) / droneSpeed)
     if (candidateRouteLength <= droneAutonomy) and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
         totalUnfeasibility = False
         if node_t != associatedDepot:
@@ -318,7 +316,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=30):
     return simplePaths, simplePathsLeg
 
 
-def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=30, recursiveAlgorithm=False, printStatistics=False):
+def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=45, recursiveAlgorithm=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g,
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     printStatistics option True displays some statistics"""
@@ -403,28 +401,27 @@ def buildTimeWindows(numberOfDepots, separatedTW=False, randomTW=False, tightTW=
     timeWindows = []
 
     if separatedTW:
-        timeStep = int(float(86400) / numberOfDepots)
+        timeStep = int(float(3600) / numberOfDepots)
         for i in range(numberOfDepots):
             if False:#i == 0:  # the recharging station of the central depot is open all day
-                timeWindows.append([0, 86400])
+                timeWindows.append([0, 3600])
             else:
                 timeWindows.append([timeStep * i, timeStep * (i + 1)])
 
     if randomTW:
         for i in range(numberOfDepots):
-            a = random.randint(0, 86400)
-            b = random.randint(0, 86400)
+            a = random.randint(0, 3600)
+            b = random.randint(0, 3600)
             if b >= a:
                 timeWindows.append([a, b])
             else:
                 timeWindows.append([b, a])
 
     if tightTW:
-        TWspacing = int(TWspacing * 60)  # converting to seconds
         for i in range(numberOfDepots):
             TWstateOk = False
             while not TWstateOk:
-                start = random.randint(0, 86400-TWspacing)  # we ensure that the time windows are within the day
+                start = random.randint(0, 3600-TWspacing)  # we ensure that the time windows are within the day
                 end = start + TWspacing
                 if timeWindows == []:  # base case : timeWindows is empty
                     timeWindows.append([start, end])  # a tight time window of TWspacing minutes is considered
