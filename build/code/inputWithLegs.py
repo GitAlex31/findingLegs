@@ -3,54 +3,6 @@
 import simplePaths
 import graph
 
-def createSummaryFile(g, fileName, droneSpeed=600, droneAutonomy=45, recursiveAlgorithm=True, printStatistics=False):
-    """Returns a text file that contains the list of legs with all the necessary information.
-    A leg is represented by a unique id, its time of travel, origin and a destination depots, and the
-    list of its visited customers or sites.
-    Beware : the returned text is only informative but not used by GENCOL or other program in any way."""
-
-    simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy,
-                                                                            recursiveAlgorithm, printStatistics)
-
-    fileName = "../output/" + fileName  # builds the input file into the right directory
-    myFile = open(fileName, "w")
-    myFile.write("Number of customers: {}   Number of Depots: {}    Drone Autonomy: {} min  Drone Speed:{} m/min"
-                 .format(len(g.getCustomers()), int(len(g.getDepots()) / 2), droneAutonomy, droneSpeed))
-    myFile.write('\n \n')
-
-    # description of the columns
-    myFile.write("leg_id    time    originDepot destinationDepot    visitedNodes")
-    myFile.write('\n')
-
-    # filling the file with legs
-    for i, leg in enumerate(simplePathsList):
-        leg_id = i
-
-        if leg[0] in g.getOtherDepots():  # associate a real depot to the virtual one
-            dep = g.getRealDepots()[g.getOtherDepots().index(leg[0])]
-        else:
-            dep = leg[0]
-
-        if leg[-1] in g.getOtherDepots():
-            dest = g.getRealDepots()[g.getOtherDepots().index(leg[-1])]
-        else:
-            dest = leg[-1]
-
-        legObject = graph.Path(leg)  # more OOP way
-
-        time = legObject.computeLength(droneSpeed)
-
-        visitedNodesStr = str()
-        if len(leg) > 2:
-            visitedNodesStr = " ".join([node.getName() for node in leg[1:-1]])
-
-
-        myFile.write(str(leg_id) + '        ' + str(round(time, 1)) + '         ' + str(dep.getName())
-                     + '           ' + str(dest.getName()) + '                   '
-                     '[' + visitedNodesStr + ']')
-        myFile.write('\n')
-    pass
-
 def createGENCOLInputFile(fileName):
     myFile = open(fileName, 'w')
     pass
@@ -105,7 +57,7 @@ def createGENCOLInputFileNodes(fileName, g, timeIntervals, antiSymmetry):
     pass
 
 
-def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=45, recursiveAlgorithm=False,
+def createGENCOLInputFileArcs(fileName, g, droneSpeed=600, droneAutonomy=60, recursiveAlgorithm=False,
                               printStatistics=False, VrpGencolFormatting=False):
 
     simplePathsList, simplePathsListLeg = simplePaths.exploreAllSimplePaths(g, droneSpeed, droneAutonomy,
@@ -179,7 +131,7 @@ def createGENCOLInputFileNetwork(fileName):
     myFile.write("\n};")
 
 
-def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=45,
+def createCompleteGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=60,
                                   recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=False, antiSymmetry=True):
     """Creates the complete GENCOL input file used by GENCOL to solve the VRPTW"""
     fileName = "../output/" + fileName  # builds the GENCOL input file into the right directory
@@ -210,7 +162,7 @@ def createVrpGENCOLInputFileNetwork(fileName):
     myFile.close()
 
 
-def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=45,
+def createCompleteVrpGENCOLInputFile(fileName, g, fixedCost, timeIntervals, droneSpeed=600, droneAutonomy=60,
                                      recursiveAlgorithm=False, printStatistics=False, VrpGencolFormatting=True, antiSymmetry=True):
     """Creates the VrpGENCOL input file used by VrpGencol to solve the VRP-TW"""
     fileName = "../output/" + fileName  # builds the VrpGencol input file into the right directory

@@ -3,7 +3,7 @@
 import graph
 import math, itertools, time, random
 
-def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=45):
+def exploreSimplePaths(g, s, t, currentPath=[], simplePaths=[], droneSpeed=600, droneAutonomy=60):
     """Function that returns the list of all simple paths between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
@@ -85,7 +85,7 @@ def filterSimplePaths(g, simplePaths, droneSpeed=600):
         return simplePaths
 
 
-def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=45):
+def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=60):
     """Returns the list of least cost simple paths of customers between node named s and node named t in graph g.
     s and t have to be different at the beginning."""
 
@@ -316,7 +316,7 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=45):
     return simplePaths, simplePathsLeg
 
 
-def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=45, recursiveAlgorithm=False, printStatistics=False):
+def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=60, recursiveAlgorithm=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g,
     with a drone speed of 600 m/min and an autonomy of 25 min by default.
     printStatistics option True displays some statistics"""

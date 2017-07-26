@@ -160,7 +160,7 @@ class Digraph(object):
         return res[:-1]
 
 
-def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, explorationTime=5):  # TODO : maxDistance should be an attribute of graph ?
+def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, serviceTime):  # TODO : maxDistance should be an attribute of graph ?
     """Builds graph g with user-defined parameter values and random positions for nodes : customers and depots.
     We create dummy vertices to allow for self-loops is the duplication of depots."""
 
@@ -171,7 +171,7 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, expl
         x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
         y = random.random() * maxDistance
         name = str(i)
-        customers.append(Node(name, x, y, explorationTime))
+        customers.append(Node(name, x, y, serviceTime))
 
     depots = []
     # first we add the central depot named "0"
