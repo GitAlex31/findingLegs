@@ -25,7 +25,7 @@ def main():
                 print("Time windows type : {}\n".format(timeWindowsTypeItr))
                 for serviceTimeItr in serviceTimeList:
                     for numberOfCustomersItr in numberOfCustomersList:
-                        print("Service time : {}".format(serviceTimeItr))
+                        #print("Service time : {}".format(serviceTimeItr))
 
                         random.seed(123)  # useful for debugging purposes - leave as "123"
                         maxDistance = 5000  # in meters

@@ -370,16 +370,16 @@ def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=60, recursiveAlgorith
         numberOfCustomers = len(g.getCustomers())
         numberOfDepots = len(g.getDepots())
         numberOfDepots = int(numberOfDepots / 2)  # this is the number of real depots
-        print("Number of customers : {}".format(numberOfCustomers))
-        print("Number of depots : {}".format(numberOfDepots))
-        print("Number of paths : ", len(allSimplePaths))
+        # print("Number of customers : {}".format(numberOfCustomers))
+        # print("Number of depots : {}".format(numberOfDepots))
+        # print("Number of paths : ", len(allSimplePaths))
         min_nbr = min([len(path) - 2 for path in allSimplePaths])  # always 0 for because of same depots legs
         max_nbr = max([len(path) - 2 for path in allSimplePaths])
-        print("Min number of customers between two depots : {}".format(min_nbr))
-        print("Max number of customers between two depots : {}".format(max_nbr))
+        # print("Min number of customers between two depots : {}".format(min_nbr))
+        # print("Max number of customers between two depots : {}".format(max_nbr))
         mean = float(sum([len(path) - 2 for path in allSimplePaths]))
         mean /= len(allSimplePaths)
-        print("Mean number of customers per leg : {}".format(mean))
+        # print("Mean number of customers per leg : {}".format(mean))
         # number of simple paths between any pair of depots in a directed clique, with origin and destination different
         totalNumberPaths = math.factorial(numberOfCustomers) * sum(
             [1 / math.factorial(k) for k in range(numberOfCustomers + 1)])
@@ -391,16 +391,17 @@ def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=60, recursiveAlgorith
         totalNumberPaths += numberOfPathsForOneSelfLoop * numberOfDepots
         totalNumberPaths -= numberOfDepots
 
-        print("Total possible number of paths : {}".format(totalNumberPaths))
+        # print("Total possible number of paths : {}".format(totalNumberPaths))
         fracPaths = len(allSimplePaths) / totalNumberPaths
-        print("Fraction of used paths : {} %".format(fracPaths * 100))
+        # print("Fraction of used paths : {} %".format(fracPaths * 100))
 
         # for quick copy-paste in LaTeX
-        print("{} & {} & {} & {} & {} & {}".format(numberOfCustomers, len(allSimplePaths), fracPaths * 100,
+        print("& {} & {} & {} & {} & {} & {}\\\\".format(numberOfCustomers, len(allSimplePaths), fracPaths * 100,
                                                    round(mean, 3), max_nbr, round(time.time() - start_time, 3)))
+        print("\cline{2-7}")
 
-    print("\n Time used for generating the legs : --- {} seconds --- with {} algorithm\n"
-          .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
+    # print("\n Time used for generating the legs : --- {} seconds --- with {} algorithm\n"
+    #       .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
 
     return allSimplePaths, allSimplePathsLeg
 
