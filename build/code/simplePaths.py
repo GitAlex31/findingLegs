@@ -123,7 +123,6 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=60):
             totalUnfeasibility1 = True
 
             if (candidateRouteLength < droneAutonomy) and (node_s.getTimeWindow()[0] + candidateRouteLength <= node_t.getTimeWindow()[1]):
-
                 simplePaths.append(temporaryList[:])  # we copy the list to avoid aliasing
                 simplePathsLeg.append(graph.Path(temporaryList[:]))
                 totalUnfeasibility1 = False
@@ -318,10 +317,11 @@ def exploreSimplePathsNonRecursive(g, s, t, droneSpeed=666, droneAutonomy=60):
 
 def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=60, recursiveAlgorithm=False, printStatistics=False):
     """Returns the list of all simple paths between depots in graph g,
-    with a drone speed of 600 m/min and an autonomy of 25 min by default.
+    with a drone speed of 666 m/min and an autonomy of one hour by default.
     printStatistics option True displays some statistics"""
 
     start_time = time.time()
+    time_limit = 7200  # time limit in seconds for which no further loop is executed
 
     allSimplePaths = []
     allSimplePathsLeg = []
@@ -332,36 +332,46 @@ def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=60, recursiveAlgorith
     for depot in depotsListForGraphExploration:  # generating legs with different start and ending depots
         for other in depotsListForGraphExploration:
             if depot != other:
-                if recursiveAlgorithm:
-                    simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
-                    #allSimplePaths.extend(simplePaths)
-                    allSimplePathsLeg.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                if time.time() - start_time <= time_limit:
+                    if recursiveAlgorithm:
+                        simplePaths = exploreSimplePaths(g, depot.getName(), other.getName(), [], [], droneSpeed, droneAutonomy)
+                        #allSimplePaths.extend(simplePaths)
+                        allSimplePathsLeg.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+                    else:
+                        simplePaths, simplePathsLeg = exploreSimplePathsNonRecursive(g, depot.getName(), other.getName(),
+                                                                                     droneSpeed, droneAutonomy)
+                        allSimplePaths.extend(simplePaths)
+                        allSimplePathsLeg.extend(simplePathsLeg)
                 else:
-                    simplePaths, simplePathsLeg = exploreSimplePathsNonRecursive(g, depot.getName(), other.getName(),
-                                                                                 droneSpeed, droneAutonomy)
-                    allSimplePaths.extend(simplePaths)
-                    allSimplePathsLeg.extend(simplePathsLeg)
+                    print("Overtime !")
 
     for depot in depotsListForSelfLoops:  # generating legs beginning and ending at the same depot
 
-        associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]  # real depot associated
+        if time.time() - start_time <= time_limit:
 
-        if recursiveAlgorithm:
-            simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
-            #allSimplePaths.extend(simplePaths)
-            allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+            # real depot associated
+            associatedDepot = depotsListForGraphExploration[depotsListForSelfLoops.index(depot)]
+
+            if recursiveAlgorithm:
+                simplePaths = exploreSimplePaths(g, depot.getName(), associatedDepot.getName(), [], [], droneSpeed, droneAutonomy)
+                #allSimplePaths.extend(simplePaths)
+                allSimplePaths.extend(filterSimplePaths(g, simplePaths, droneSpeed))
+            else:
+                simplePaths, simplePathsLeg = exploreSimplePathsNonRecursive(g, depot.getName(), associatedDepot.getName(),
+                                                                             droneSpeed, droneAutonomy)
+                allSimplePaths.extend(simplePaths)
+                allSimplePathsLeg.extend(simplePathsLeg)
+
         else:
-            simplePaths, simplePathsLeg = exploreSimplePathsNonRecursive(g, depot.getName(), associatedDepot.getName(),
-                                                                         droneSpeed, droneAutonomy)
-            allSimplePaths.extend(simplePaths)
-            allSimplePathsLeg.extend(simplePathsLeg)
+            print("Overtime !")
+
 
     if printStatistics:  # useful statistics about the built graph
         numberOfCustomers = len(g.getCustomers())
         numberOfDepots = len(g.getDepots())
         numberOfDepots = int(numberOfDepots / 2)  # this is the number of real depots
         print("Number of customers : {}".format(numberOfCustomers))
-        print("Number of Depots : {}".format(numberOfDepots))
+        print("Number of depots : {}".format(numberOfDepots))
         print("Number of paths : ", len(allSimplePaths))
         min_nbr = min([len(path) - 2 for path in allSimplePaths])  # always 0 for because of same depots legs
         max_nbr = max([len(path) - 2 for path in allSimplePaths])
@@ -385,11 +395,12 @@ def exploreAllSimplePaths(g, droneSpeed=666, droneAutonomy=60, recursiveAlgorith
         fracPaths = len(allSimplePaths) / totalNumberPaths
         print("Fraction of used paths : {} %".format(fracPaths * 100))
 
-        print("{} & {} & {} & {}".format(len(allSimplePaths), fracPaths * 100, round(mean, 4), max_nbr))  # for copy-paste in LaTeX
+        # for quick copy-paste in LaTeX
+        print("{} & {} & {} & {} & {} & {}".format(numberOfCustomers, len(allSimplePaths), fracPaths * 100,
+                                                   round(mean, 3), max_nbr, round(time.time() - start_time, 3)))
 
-    print("\n Time used for generating the legs : --- {} seconds --- with {} algorithm"
+    print("\n Time used for generating the legs : --- {} seconds --- with {} algorithm\n"
           .format(time.time() - start_time, "recursive" if recursiveAlgorithm else "non-recursive"))
-
 
     return allSimplePaths, allSimplePathsLeg
 

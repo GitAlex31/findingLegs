@@ -3,13 +3,10 @@
 import matplotlib.pyplot as plt
 
 def buildResultsDictionary(reportFileName):
-    """Build the dictionary of results for a single VrpGencol report file named reportFileName"""
+    """Build the dictionary of results for a single VrpGencol report file named reportFileName."""
 
-    results = dict()  # initialization of the dictionary of results
+    results = dict()
 
-    # we save the relevant parameters in variables
-
-    # with open automatically closes the file when not used anymore
     with open("../input/" + reportFileName, 'r') as reportFile:
 
         for line in reportFile:

@@ -164,33 +164,40 @@ def buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, serv
     """Builds graph g with user-defined parameter values and random positions for nodes : customers and depots.
     We create dummy vertices to allow for self-loops is the duplication of depots."""
 
+    random.seed(123)  # for results replication
+
     g = Digraph()
 
-    customers = []
-    for i in range(1, numberOfCustomers+1):
-        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
-        y = random.random() * maxDistance
-        name = str(i)
-        customers.append(Node(name, x, y, serviceTime))
+    # Position randomly the depots in the square of side length maxDistance
+    # First we add the central depot named 0
+    # and depot named "numberOfCustomers + 1" its corresponding virtual depot for self-loops paths
+    # then we add the other depots
 
     depots = []
-    # first we add the central depot named "0"
-    # and depot named "numberOfCustomers + 1" its corresponding virtual depot for self-loops paths
     timeWindowsIdx = 0
     x = random.random() * maxDistance
     y = random.random() * maxDistance
-    #depots.append(Node(str(0), x, y, -1))
+    # depots.append(Node(str(0), x, y, -1))
     depots.append(Node(str(0), x, y, -1, timeWindows[timeWindowsIdx]))
     depots.append(Node(str(numberOfCustomers + 1), x, y, -1, timeWindows[timeWindowsIdx]))
 
     name = numberOfCustomers + 2  # names of the real depots other than the central depot
-    for i in range(numberOfCustomers+2, numberOfCustomers + numberOfDepots+1):
+    for i in range(numberOfCustomers + 2, numberOfCustomers + numberOfDepots + 1):
         timeWindowsIdx += 1
-        x = random.random() * maxDistance  # square of dimensions maxDistance*maxDistance
+        x = random.random() * maxDistance
         y = random.random() * maxDistance
-        depots.append(Node(str(name), x, y, -1, timeWindows[timeWindowsIdx]))  # -1 indicates no service time for the depot
-        depots.append(Node(str(name+1), x, y, -1, timeWindows[timeWindowsIdx]))  # we duplicate each depot
+        depots.append(
+            Node(str(name), x, y, -1, timeWindows[timeWindowsIdx]))  # -1 indicates no service time for the depot
+        depots.append(Node(str(name + 1), x, y, -1, timeWindows[timeWindowsIdx]))  # we duplicate each depot
         name += 2
+
+    # Position randomly the customers in the square of side maxDistance
+    customers = []
+    for i in range(1, numberOfCustomers+1):
+        x = random.random() * maxDistance
+        y = random.random() * maxDistance
+        name = str(i)
+        customers.append(Node(name, x, y, serviceTime))
 
     # generation of a graph allowing the exploration of the complete graph and also the self circuits
     nodes = customers + depots

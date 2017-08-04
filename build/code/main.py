@@ -8,16 +8,24 @@ def main():
 
     sys.stdout = open('stdout.txt', 'w')  # writes the standard output to a stdout.txt instead of the standard output
     droneAutonomyList = [60]  # considered fixed
-    numberOfCustomersList = [10, 12, 15, 20, 25, 30, 35, 40, 45, 50]
-    numberOfDepotsList = [2]
-    timeWindowsList = ["tight60"]
-    serviceTimeList = [10]
 
-    for numberOfCustomersItr in numberOfCustomersList:
+    numberOfCustomersList = [10, 15, 20, 25, 30, 35]
+    numberOfDepotsList = [3]
+    timeWindowsList = ["tight15", "tight30", "tight45", "tight60"]
+    serviceTimeList = [45, 30, 20, 15]
+
+    # numberOfCustomersList = [35]
+    # numberOfDepotsList = [2]
+    # timeWindowsList = ["tight15"]
+    # serviceTimeList = [30]
+
+    for numberOfDepotsItr in numberOfDepotsList:
         for droneAutonomyItr in droneAutonomyList:
             for timeWindowsTypeItr in timeWindowsList:
-                for numberOfDepotsItr in numberOfDepotsList:
-                    for serviceTimeItr in serviceTimeList:
+                print("Time windows type : {}\n".format(timeWindowsTypeItr))
+                for serviceTimeItr in serviceTimeList:
+                    for numberOfCustomersItr in numberOfCustomersList:
+                        print("Service time : {}".format(serviceTimeItr))
 
                         random.seed(123)  # useful for debugging purposes - leave as "123"
                         maxDistance = 5000  # in meters
@@ -40,7 +48,13 @@ def main():
                         if numberOfCustomers >= 1 and numberOfDepots >= 1:
                             # building a random graph with specified parameters
                             g = graph.buildGraph(numberOfCustomers, numberOfDepots, maxDistance, timeWindows, serviceTimeItr)
-                            pickle.dump(g, open("../temp/graph.p", "wb"))
+                            # pickle.dump(g, open("../temp/graph{}_{}_{}_{}_s{}.p".format(numberOfCustomers,
+                            #                                                             numberOfDepots, maxDistance,
+                            #                                                             timeWindowsType,
+                            #                                                             serviceTimeItr), "wb"))
+                            # we save the produced graph in a binary file useful for the display functionality
+                            pickle.dump(g, open("../temp/graph{}_{}_{}.p".format(numberOfCustomers, numberOfDepots,
+                                                                                 maxDistance), "wb"))
                         else:
                             raise ValueError("The network must have at least 1 customer and 1 depot.")
 
