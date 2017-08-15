@@ -9,15 +9,15 @@ def main():
     sys.stdout = open('stdout.txt', 'w')  # writes the standard output to a stdout.txt instead of the standard output
     droneAutonomyList = [60]  # considered fixed
 
-    numberOfCustomersList = [10, 15, 20, 25, 30, 35]
-    numberOfDepotsList = [3]
-    timeWindowsList = ["tight15", "tight30", "tight45", "tight60"]
-    serviceTimeList = [45, 30, 20, 15]
+    # numberOfCustomersList = [10, 15, 20, 25, 30, 35]
+    # numberOfDepotsList = [3, 4, 5]
+    # timeWindowsList = ["tight15", "tight30", "tight45", "tight60"]
+    # serviceTimeList = [45, 30, 20, 15]
 
-    # numberOfCustomersList = [35]
-    # numberOfDepotsList = [2]
-    # timeWindowsList = ["tight15"]
-    # serviceTimeList = [30]
+    numberOfCustomersList = [30, 35]
+    numberOfDepotsList = [2]
+    timeWindowsList = ["tight45"]
+    serviceTimeList = [15]
 
     for numberOfDepotsItr in numberOfDepotsList:
         for droneAutonomyItr in droneAutonomyList:
